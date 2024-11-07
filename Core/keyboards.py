@@ -1,17 +1,5 @@
 from telebot import types
 
-"""
-def  create_keyboard(srt = []):
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-
-    for text in srt:
-        markup.add(types.KeyboardButton(text)) # добавление кнопки об информации
-        
-    return markup
-"""
-
-
-
 
 def keyboard_start():
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)  # resize_keyboard=True аналогично C# ResizeKeyboard = true

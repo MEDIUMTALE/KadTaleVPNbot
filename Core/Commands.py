@@ -1,32 +1,48 @@
 import telebot
 from telebot import types
-from Core.keyboards import *
-from main import *
+from Core.keyboards import *  # Импорт клавиатур из Core.keyboards
+# from main import *  # Этот импорт больше не нужен
 
 def CommandProcessing(message, bot):
+        
+    if message.text == "/start":
+        bot.send_message(
+            message.chat.id,
+            "Привет! Выбери один из вариантов ниже, чтобы получить информацию.",
+            reply_markup=keyboard_start()
+        )
+
 
     # обработка основных кнопок
     if message.text == "Информация о VPN 📜":
         bot.send_message(message.chat.id, "KadTaleVPN был сделан неравнодушными людьми, которым не всеравно на проблему свободного интернета в стране.")
+
     elif message.text == "Тарифы 📚":
         tarif_photo = open("ViewModels/resourse/img/tarif.png", "rb")
         bot.send_photo(message.chat.id, tarif_photo)
+
     elif message.text == "Получить ключ 🔑":
-        keyboard_tariff(message)
+        bot.send_message(
+            message.chat.id,
+            "Выверите интересующий вас тариф, или вернитесь в меню.",
+            reply_markup=keyboard_tariff()
+        )
+        
     elif message.text == "Инструкция 📝":
-        keyboard_Manual(message)
+        bot.send_message(
+            message.chat.id,
+            "Выверите инструкцию подходящую под ваше устройство, или вернитесь в меню.",
+            reply_markup=keyboard_Manual()
+        )
 
 
     # обработка кнопки назад
     elif message.text == "Назад ⏪":
         bot.send_message(
-        message.chat.id,
-        "Привет! Выбери один из вариантов ниже, чтобы получить информацию.",
-        reply_markup=keyboard_start()
-    )
-
-
-
+            message.chat.id,
+            "Привет! Выбери один из вариантов ниже, чтобы получить информацию.",
+            reply_markup=keyboard_start()
+        )
 
 
 

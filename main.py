@@ -1,7 +1,7 @@
 import telebot
 from telebot import types
 from Core.keyboards import *
-from Core.Commands import *
+from Core.Commands import CommandProcessing  # Правильный импорт функции
 
 token = "7622209066:AAFoZZanqTXQZdK8fwXHqngmcOUAiUHZxpc"
 
@@ -23,6 +23,3 @@ def handle_buttons(message):
     CommandProcessing(message, bot)
 
 bot.polling(none_stop=True)
-
-
-
