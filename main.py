@@ -7,15 +7,6 @@ token = "7622209066:AAFoZZanqTXQZdK8fwXHqngmcOUAiUHZxpc"
 
 bot = telebot.TeleBot(token)
 
-# Обработчик команды /start
-@bot.message_handler(commands=['start'])
-def start(message):
-    bot.send_message(
-        message.chat.id,
-        "Привет! Выбери один из вариантов ниже, чтобы получить информацию.",
-        reply_markup=keyboard_start()
-    )
-
 
 # Обработчик нажатий на все кнопки
 @bot.message_handler(func=lambda message: True)
