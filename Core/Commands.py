@@ -3,13 +3,14 @@ from telebot import types
 from Core.keyboards import *  # Импорт клавиатур из Core.keyboards
 # from main import *  # Этот импорт больше не нужен
 
-def CommandProcessing(message, bot):
-        
+def CommandProcessing(message, bot, callback = None):
+
+    # обработка команды /start
     if message.text == "/start":
         bot.send_message(
             message.chat.id,
             "Привет! Выбери один из вариантов ниже, чтобы получить информацию.",
-            reply_markup=keyboard_start()
+            reply_markup = keyboard_start()
         )
 
 
@@ -17,53 +18,48 @@ def CommandProcessing(message, bot):
     elif message.text == "Информация о VPN 📜":
         bot.send_message(message.chat.id, "KadTaleVPN был сделан неравнодушными людьми, которым не всеравно на проблему свободного интернета в стране.")
 
-    elif message.text == "Тарифы 📚":
-        tarif_photo = open("ViewModels/resourse/img/tarif.png", "rb")
-        bot.send_photo(message.chat.id, tarif_photo)
-
+    # получить ключ
     elif message.text == "Получить ключ 🔑":
         bot.send_message(
             message.chat.id,
             "Выверите интересующий вас тариф, или вернитесь в меню.",
-            reply_markup=keyboard_tariff()
-        )
-        
-    elif message.text == "Инструкция 📝":
-        bot.send_message(
-            message.chat.id,
-            "Выверите инструкцию подходящую под ваше устройство, или вернитесь в меню.",
-            reply_markup=keyboard_Manual()
+            reply_markup = keyboard_tariff()
         )
 
+    # преобрести подписку
+    elif message.text == "Преобрести подписку ⚔️":
+        bot.send_message(message.chat.id,
+        "Выберите вариант подписки:",
+        reply_markup = purchase_a_subscription()
+        )
+
+    # помощь
+    elif message.text == "Помощь 🛟":
+        bot.send_message(message.chat.id,
+        "Чем вам помочь?:",
+        reply_markup = help_menu()
+        )
+
+    elif callback:
+        if callback.data == "help_two":
+            bot.send_message(callback.message.chat.id, "Как установить VPN...")
+        elif callback.data == "help_two":
+            bot.send_message(callback.message.chat.id, "Как установить VPN...")
+
+    # смена языка
+    elif message.text == "Язык 🗺️":
+        bot.send_message(message.chat.id,
+        "Пожалуйста, выберите язык интерфейса:",
+        reply_markup = language_choice()
+        )
 
     # обработка кнопки назад
     elif message.text == "Назад ⏪":
         bot.send_message(
             message.chat.id,
             "Привет! Выбери один из вариантов ниже, чтобы получить информацию.",
-            reply_markup=keyboard_start()
+            reply_markup = keyboard_start()
         )
-
-
-
-    # обработка нажатий на дополнительные кнопки поддержки
-    elif message.text == "Тариф Free":
-        bot.send_message(message.chat.id, "В разработке...")
-
-    elif message.text == "Тариф Lite":
-        bot.send_message(message.chat.id, "В разработке...")
-
-    elif message.text == "Тариф Basic":
-        bot.send_message(message.chat.id, "В разработке...")
-
-    elif message.text == "Тариф Maxi":
-        bot.send_message(message.chat.id, "В разработке...")
-
-
-
-
-
-
 
 
 
@@ -71,6 +67,7 @@ def CommandProcessing(message, bot):
     elif message.text == "Для Android 🤖":
         bot.send_message(message.chat.id, "в разработке...")
 
+    # инструкция для Iphone
     elif message.text == "Для Iphone 🍎":
         # шаг 1
         bot.send_message(message.chat.id,
