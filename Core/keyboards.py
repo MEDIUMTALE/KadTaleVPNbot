@@ -1,4 +1,5 @@
 from telebot import types
+import sqlite3
 
 
 def keyboard_start():
@@ -36,16 +37,18 @@ def keyboard_tariff():
 
     return markup
 
-def keyboard_Manual():
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)  # resize_keyboard=True аналогично C# ResizeKeyboard = true
+# помощь в установке vpn
+def guide_menu():
+    markup = types.InlineKeyboardMarkup()
 
     # добавляем строки кнопок (аналог двумерного массива)
-    row1 = [types.KeyboardButton("Для Android 🤖"), types.KeyboardButton("Для Iphone 🍎")]
-    row2 = [types.KeyboardButton("Назад ⏪")]
+    row1 = [
+        types.InlineKeyboardButton("Для Android 🤖", callback_data="help_android"),
+        types.InlineKeyboardButton("Для Iphone 🍎", callback_data="help_iphone")
+            ]
 
-    # добавляем строки в клавиатуру
+    # добавляем строку в клавиатуру
     markup.add(*row1)
-    markup.add(*row2)
 
     return markup
 
@@ -53,10 +56,13 @@ def keyboard_Manual():
 def purchase_a_subscription():
     markup = types.InlineKeyboardMarkup()
 
-    row1 = [types.InlineKeyboardButton("test_one", callback_data="tariff_1"),
-            types.InlineKeyboardButton("test_two", callback_data="tariff_2")]
+    row1 = [types.InlineKeyboardButton("150₽(1 месяц)", callback_data="tariff_1"),
+            types.InlineKeyboardButton("250₽(3 месяца)", callback_data="tariff_2")]
+    row2 = [types.InlineKeyboardButton("350₽(6 месяцев)", callback_data="tariff_3"),
+            types.InlineKeyboardButton("500₽(12 месяцев)", callback_data="tariff_4")]
 
     markup.add(*row1)
+    markup.add(*row2)
 
     return markup
 
