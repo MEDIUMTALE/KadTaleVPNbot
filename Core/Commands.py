@@ -1,80 +1,106 @@
 import telebot
 from telebot import types
-from Core.keyboards import *  # Импорт клавиатур из Core.keyboards
-# from main import *  # Этот импорт больше не нужен
-from Core.Databases import add_user
+from Core.keyboards import *  # Импорт клавиатур
+from Core.Databases import add_user  # Добавление пользователей
 
+# Текст информации о VPN
+info_about_vpn_text = "⚔️ KadTaleVPN ⚔️\n\n🔹 Мгновенный и удобный VPN прямо в Telegram\n\n✅ Доступ к Instagram, YouTube, TikTok и др.\n\n🚀 Высокая скорость без рекламы\n\n🛜 Стабильное соединение\n\n💳 Оплата картами РФ и СБП\n\n⚡️ Шифрование трафика и скрытие IP"
+
+### 🔹 Функции обработки команд
+def start_command(message, bot):
+    user_id = message.from_user.id
+    add_user(user_id)
+    bot.send_message(message.chat.id, "Вы зарегистрированы!", reply_markup=keyboard_start())
+    bot.send_message(message.chat.id, "Привет! Выбери один из вариантов ниже:", reply_markup=keyboard_start())
+
+def info_vpn_command(message, bot):
+    bot.send_message(message.chat.id, info_about_vpn_text)
+
+def buy_subscription_command(message, bot):
+    bot.send_message(message.chat.id, "Выберите вариант подписки:", reply_markup=purchase_a_subscription())
+
+def help_command(message, bot):
+    bot.send_message(message.chat.id, "Чем вам помочь?", reply_markup=help_menu())
+
+def back_command(message, bot):
+    bot.send_message(message.chat.id, "Привет! Выбери один из вариантов ниже:", reply_markup=keyboard_start())
+
+def language_command(message, bot):
+    bot.send_message(message.chat.id, "Пожалуйста, выберите язык:", reply_markup=language_choice())
+
+# Словарь команд
+COMMANDS = {
+    "/start": start_command,
+    "Информация о VPN 📜": info_vpn_command,
+    "Пополнить баланс ⚔️": buy_subscription_command,
+    "Помощь 🛟": help_command,
+    "Назад ⏪": back_command,
+    "Язык 🗺️": language_command,
+}
+
+### 🔹 Функции обработки callback-кнопок
+def help_faq(callback, bot):
+    bot.send_message(callback.message.chat.id, "В разработке...")
+    bot.delete_message(callback.message.chat.id, callback.message.message_id)
+
+def help_install(callback, bot):
+    bot.send_message(callback.message.chat.id, "Выберите ОС:", reply_markup=guide_menu())
+    bot.delete_message(callback.message.chat.id, callback.message.message_id)
+
+def help_android(callback, bot):
+    bot.send_message(callback.message.chat.id, "В разработке...")
+    bot.delete_message(callback.message.chat.id, callback.message.message_id)
+
+def help_iphone(callback, bot):
+    bot.send_message(callback.message.chat.id, "В разработке...")
+
+    bot.delete_message(callback.message.chat.id, callback.message.message_id)
+
+def help_pc(callback, bot):
+    bot.send_message(callback.message.chat.id, "В разработке...")
+
+    bot.delete_message(callback.message.chat.id, callback.message.message_id)
+
+def help_tv(callback, bot):
+    bot.send_message(callback.message.chat.id, "В разработке...")
+
+    bot.delete_message(callback.message.chat.id, callback.message.message_id)
+
+def help_support(callback, bot):
+    bot.send_message(callback.message.chat.id, "В разработке...")
+    bot.delete_message(callback.message.chat.id, callback.message.message_id)
+
+def language_ru(callback, bot):
+    bot.send_message(callback.message.chat.id, "Локализация в процессе")
+    bot.delete_message(callback.message.chat.id, callback.message.message_id)
+
+def language_en(callback, bot):
+    bot.send_message(callback.message.chat.id, "Локализация в процессе")
+    bot.delete_message(callback.message.chat.id, callback.message.message_id)
+
+# Словарь callback-кнопок
+CALLBACKS = {
+    "help_one": help_faq,
+    "help_two": help_install,
+    "help_android": help_android,
+    "help_iphone": help_iphone,
+    "help_three": help_support,
+    "language_ru": language_ru,
+    "language_en": language_en,
+}
+
+### 🔹 Основная обработка команд и callback-кнопок
 def CommandProcessing(message=None, bot=None, callback=None):
-    # Если это сообщение
     if message:
-        if message.text == "/start":
-            user_id = message.from_user.id
-            add_user(user_id)
-            bot.send_message(
-                message.chat.id,
-                "Привет! Выбери один из вариантов ниже, чтобы получить информацию.",
-                reply_markup=keyboard_start()
-            )
-        elif message.text == "Информация о VPN 📜":
-            bot.send_message(message.chat.id, "KadTaleVPN был сделан неравнодушными людьми, которым не всеравно на проблему свободного интернета в стране.")
-        elif message.text == "Получить ключ 🔑":
-            bot.send_message(
-                message.chat.id,
-                "Выберите интересующий вас тариф, или вернитесь в меню.",
-                reply_markup=keyboard_tariff()
-            )
-        elif message.text == "Преобрести подписку ⚔️":
-            bot.send_message(
-                message.chat.id,
-                "Выберите вариант подписки:",
-                reply_markup=purchase_a_subscription()
-            )
-        elif message.text == "Помощь 🛟":
-            bot.send_message(message.chat.id, "Чем вам помочь?:", reply_markup=help_menu())
-
-        elif message.text == "Назад ⏪":
-            bot.send_message(
-                message.chat.id,
-                "Привет! Выбери один из вариантов ниже, чтобы получить информацию.",
-                reply_markup=keyboard_start()
-            )
-        elif message.text == "Язык 🗺️":
-            bot.send_message(message.chat.id, "Пожалуйста, выберите язык интерфейса:", reply_markup=language_choice())
+        command_function = COMMANDS.get(message.text)
+        if command_function:
+            command_function(message, bot)
         else:
             bot.send_message(message.chat.id, "В разработке...")
 
-    # Если это callback
-    elif callback:
-
-        # кнопки помощи
-
-        # часто задаваемые вопросы
-        if callback.data == "help_one":
-            bot.send_message(callback.message.chat.id, "В разработке...")
-            bot.delete_message(chat_id=callback.message.chat.id, message_id=callback.message.message_id) # удаление
-
-        # установка vpn
-        elif callback.data == "help_two":
-            bot.send_message(callback.message.chat.id, "Пожалуйста, выберите операционную систему вашего телефона:", reply_markup=guide_menu())
-            bot.delete_message(chat_id=callback.message.chat.id, message_id=callback.message.message_id) # удаление
-
-        # android
-        elif callback.data == "help_android":
-            bot.send_message(callback.message.chat.id, "В разработке...")
-            bot.delete_message(chat_id=callback.message.chat.id, message_id=callback.message.message_id)  # удаление
-
-        # iphone
-        elif callback.data == "help_iphone":
-            bot.send_message(callback.message.chat.id, "В разработке...")
-            bot.delete_message(chat_id=callback.message.chat.id, message_id=callback.message.message_id)  # удаление
-
-        # обратиться в поддержку
-        elif callback.data == "help_three":
-            bot.send_message(callback.message.chat.id, "В разработке...")
-            bot.delete_message(chat_id=callback.message.chat.id, message_id=callback.message.message_id)
-
-        # гайды на установку
-
-        # Для других callback-ов можно добавить аналогичные условия
+    elif callback and callback.message:
+        callback_function = CALLBACKS.get(callback.data)
+        if callback_function:
+            callback_function(callback, bot)
         else:
             bot.send_message(callback.message.chat.id, "В разработке...")
