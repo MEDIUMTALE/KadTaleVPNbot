@@ -11,7 +11,7 @@ def keyboard_start():
     row2 = [types.KeyboardButton("Пополнить баланс⚔️")]
     row3 = [types.KeyboardButton("Помощь 🛟"), types.KeyboardButton("Язык 🗺️")]
     # row4 = [types.KeyboardButton("Поменять локацию 🌍"), types.KeyboardButton("Поменять протокол ⛓")]
-    row5 = [types.KeyboardButton("Пригласить 👥"), types.KeyboardButton("Партнерская промграмма 🤝")]
+    row5 = [types.KeyboardButton("Партнерка 🤝")]
 
     # Добавляем строки в клавиатуру
     markup.add(*row1)
@@ -57,8 +57,10 @@ def guide_menu():
 
     return markup
 
+
+
 # меню преобрести подписку
-def purchase_a_subscription():
+def purchase_a_subscription(): # В РАЗРАБОТКЕ!!!
     markup = types.InlineKeyboardMarkup()
 
 
@@ -68,10 +70,12 @@ def purchase_a_subscription():
 # меню помощи пользователю
 def help_menu():
     markup = types.InlineKeyboardMarkup()
+    target_username = "kadtalevpn_support"  # Укажи здесь нужный юзернейм без @
+    profile_url = f"https://t.me/{target_username}"
 
-    row1 = types.InlineKeyboardButton("Часто задаваемые вопросы", callback_data="help_one")
-    row2 = types.InlineKeyboardButton("Установка VPN", callback_data="help_two")
-    row3 = types.InlineKeyboardButton("Обратиться в поддержку", callback_data="help_three")
+    row1 = types.InlineKeyboardButton("📝 Часто задаваемые вопросы", callback_data="frequent_questions")
+    row2 = types.InlineKeyboardButton("🛠 Инструкция по установке VPN", callback_data="installation_instructions")
+    row3 = types.InlineKeyboardButton("📮 Обратиться в поддержку", url=profile_url, callback_data="contact_support")
 
     markup.add(row1)
     markup.add(row2)
