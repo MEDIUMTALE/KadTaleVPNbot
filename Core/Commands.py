@@ -1,10 +1,10 @@
-import telebot
-from telebot import types
+
 from Core.keyboards import *  # Импорт клавиатур
 from Core.Databases import add_user  # Добавление пользователей
+from Core.text import text
 
 # Текст информации о VPN
-info_about_vpn_text = "⚔️ KadTaleVPN ⚔️\n\n🔹 Мгновенный и удобный VPN прямо в Telegram\n\n✅ Доступ к Instagram, YouTube, TikTok и др.\n\n🚀 Высокая скорость без рекламы\n\n🛜 Стабильное соединение\n\n💳 Оплата картами РФ и СБП\n\n⚡️ Шифрование трафика и скрытие IP"
+
 
 ### 🔹 Функции обработки команд
 def start_command(message, bot):
@@ -14,50 +14,56 @@ def start_command(message, bot):
     bot.send_message(message.chat.id, "Привет! Выбери один из вариантов ниже:", reply_markup=keyboard_start())
 
 def info_vpn_command(message, bot):
-    bot.send_message(message.chat.id, info_about_vpn_text)
+    bot.send_message(message.chat.id, text["info_vpn_command_text"])
 
 def buy_subscription_command(message, bot):
-    bot.send_message(message.chat.id, "Выберите вариант подписки:", reply_markup=purchase_a_subscription())
+    bot.send_message(message.chat.id, text["buy_subscription_command_text"], reply_markup=purchase_a_subscription())
 
 def help_command(message, bot):
-    bot.send_message(message.chat.id, "Меню помощи:\n\nВ случае если вы не нашли ответ на вопрос здесь, можете написать в нашу поддержку, которая вам с радостью поможет!", reply_markup=help_menu())
+    bot.send_message(message.chat.id, text["help_command_text"], reply_markup=help_menu())
 
 def back_command(message, bot):
-    bot.send_message(message.chat.id, "Привет! Выбери один из вариантов ниже:", reply_markup=keyboard_start())
-
-def language_command(message, bot):
-    bot.send_message(message.chat.id, "Пожалуйста, выберите язык:", reply_markup=language_choice())
+    bot.send_message(message.chat.id, "Выбери один из вариантов ниже:", reply_markup=keyboard_start())
 
 def invite_friend(message, bot):
     bot.send_message(message.chat.id, "Вы можете пригласить друга, и вы оба получите вознаграждение! (в разработке)")
-# Словарь команд
+
+# словарь команд
 COMMANDS = {
     "/start": start_command,
     "Информация о VPN 📜": info_vpn_command,
-    "Пополнить баланс ⚔️": buy_subscription_command,
+    "Пополнить баланс 💰️": buy_subscription_command,
     "Помощь 🛟": help_command,
     "Назад ⏪": back_command,
-    "Язык 🗺️": language_command,
     "Партнерка 🤝" : invite_friend
 }
 
-### 🔹 Функции обработки callback-кнопок
+# функции обработки callback-кнопок
 def help_faq(callback, bot):
-    bot.send_message(callback.message.chat.id, "В разработке...")
+    bot.send_message(callback.message.chat.id, "Что вас интересует?", reply_markup = frequent_questions())
     bot.delete_message(callback.message.chat.id, callback.message.message_id)
 
 def help_install(callback, bot):
-    bot.send_message(callback.message.chat.id, "Выберите ОС:", reply_markup=guide_menu())
+    bot.send_message(callback.message.chat.id, "Выберите вашу ОС:", reply_markup = guide_menu())
     bot.delete_message(callback.message.chat.id, callback.message.message_id)
 
 def help_android(callback, bot):
     bot.send_message(callback.message.chat.id, "В разработке...")
     bot.delete_message(callback.message.chat.id, callback.message.message_id)
 
-def help_iphone(callback, bot):
-    bot.send_message(callback.message.chat.id, "В разработке...")
+def help_apple(callback, bot):
+    bot.send_message(callback.message.chat.id, "Выберите ваше устройство Apple:", reply_markup=apple_menu())
 
     bot.delete_message(callback.message.chat.id, callback.message.message_id)
+
+# возвращение из меню выбора устроиств apple в полное меню выбора устройств
+def help_back_apple(callback, bot):
+    bot.edit_message_text(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text="Выберите вашу ОС:",
+        reply_markup=guide_menu()  # Главное меню помощи
+    )
 
 def help_pc(callback, bot):
     bot.send_message(callback.message.chat.id, "В разработке...")
@@ -73,12 +79,17 @@ def help_support(callback, bot):
     bot.send_message(callback.message.chat.id, "Переходим на страницу поддержки")
 
     bot.delete_message(callback.message.chat.id, callback.message.message_id)
-def language_ru(callback, bot):
-    bot.send_message(callback.message.chat.id, "Локализация в процессе")
-    bot.delete_message(callback.message.chat.id, callback.message.message_id)
 
-def language_en(callback, bot):
-    bot.send_message(callback.message.chat.id, "Локализация в процессе")
+# возвращение из часто задаваемых вопросов в меню помощи
+def help_back(callback, bot):
+    bot.edit_message_text(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id,
+        text= text["help_command_text"],
+        reply_markup=help_menu()  # главное меню помощи
+    )
+
+def pay_delete(callback, bot):
     bot.delete_message(callback.message.chat.id, callback.message.message_id)
 
 # словарь callback-кнопок
@@ -86,12 +97,13 @@ CALLBACKS = {
     "frequent_questions": help_faq, # часто задавемые вопросы
     "installation_instructions": help_install, # инструкция по установке
     "help_android": help_android, # помощь клиентам андроид
-    "help_iphone": help_iphone, # помощь клиентам apple (iphone, macOS, iPad)
+    "help_iphone": help_apple, # помощь клиентам apple (iphone, macOS, iPad)
     "help_pc": help_pc, # помощь клиентам PC (windows)
     "help_tv": help_tv, # помощь клиентам TV (Android TV)
     "contact_support": help_support, # связь с поддержкой
-    "language_ru": language_ru, # смена языка на русский
-    "language_en": language_en, # смена языка на английский
+    "help_back": help_back, # возвращение назад
+    "help_back_apple": help_back_apple, # возвращение назад из меню устройств apple
+    "pay_delete" : pay_delete
 }
 
 ### 🔹 Основная обработка команд и callback-кнопок
