@@ -23,12 +23,12 @@ def keyboard_start():
 
     return markup
 
-def keyboard_balance():
+def keyboard_balance(): # РАЗОБРАТЬСЯ С ЭТОХУЙ ХУЙНЕЙ
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
 
     # добавляем строки кнопок
     row1 = [types.KeyboardButton("Пополнить баланс ⚔️", callback_data="deposit_money"), types.KeyboardButton("Пригласить друга", callback_data="invite_friend")]
-    row2 = [types.KeyboardButton("Назад ⏪")]
+    row2 = [types.KeyboardButton("⏪ Назад")]
 
     # добавляем строки в клавиатуру
     markup.add(*row1)
@@ -42,12 +42,12 @@ def guide_menu():
 
     # добавляем строки кнопок (аналог двумерного массива)
     row1 = [
-        types.InlineKeyboardButton("Для Android 🤖", callback_data="help_android"),
-        types.InlineKeyboardButton("Для TV (Android TV) 📺", callback_data="help_tv")
+        types.InlineKeyboardButton("🤖 Для Android", callback_data="help_android"),
+        types.InlineKeyboardButton("📺 Для TV (Android TV)", callback_data="help_tv")
             ]
-    row2 = [types.InlineKeyboardButton("Для IOS (Iphone, IPad, MacOS) 🍎", callback_data="help_iphone")]
-    row3 = [types.InlineKeyboardButton("Для ПК (Windows) 💻", callback_data="help_pc")]
-    row4 = [types.InlineKeyboardButton("Назад ⏪", callback_data="help_back")]
+    row2 = [types.InlineKeyboardButton("🍎 Для IOS (Iphone, IPad, MacOS)", callback_data="help_iphone")]
+    row3 = [types.InlineKeyboardButton("💻 Для ПК (Windows)", callback_data="help_pc")]
+    row4 = [types.InlineKeyboardButton("⏪ Назад", callback_data="guide_back")]
 
     # добавляем строку в клавиатуру
     markup.add(*row1)
@@ -62,9 +62,9 @@ def apple_menu():
     markup = types.InlineKeyboardMarkup()
 
     # добавляем строки кнопок (аналог двумерного массива)
-    row1 = [types.InlineKeyboardButton("Для Iphone/IPad 📱", callback_data="help_for_iphone"),]
-    row2 = [types.InlineKeyboardButton("Для MacOS 🖥", callback_data="help_for_macos")]
-    row3 = [types.InlineKeyboardButton("Назад ⏪", callback_data="help_back_apple")]
+    row1 = [types.InlineKeyboardButton("📱 Для Iphone/IPad", callback_data="help_for_iphone"),]
+    row2 = [types.InlineKeyboardButton("🖥 Для MacOS", callback_data="help_for_macos")]
+    row3 = [types.InlineKeyboardButton("⏪ Назад", callback_data="help_back_apple")]
 
 
     # добавляем строку в клавиатуру
@@ -86,6 +86,7 @@ def purchase_a_subscription():
 # меню помощи пользователю
 def help_menu():
     markup = types.InlineKeyboardMarkup()
+
     target_username = "kadtalevpn_support"
     profile_url = f"https://t.me/{target_username}"
 
@@ -106,10 +107,10 @@ def frequent_questions():
     profile_url = f"https://t.me/{target_username}"
 
     row1 = types.InlineKeyboardButton("💸 Проблема с платежом", callback_data="payment_problems")
-    row2 = types.InlineKeyboardButton("🐌 VPN Лагает / Низкая скорость", callback_data="vpn_lags")
+    row2 = types.InlineKeyboardButton("🐌 VPN Лагает / Низкая скорость", callback_data="low_speed_problems")
     row3 = types.InlineKeyboardButton("🚫 VPN Не работает", callback_data="vpn_no_work")
     row4 = types.InlineKeyboardButton("💬 Другой вопрос (поддержка)", url=profile_url, callback_data="contact_support")
-    row5 = types.InlineKeyboardButton("Назад ⏪", callback_data="help_back")
+    row5 = types.InlineKeyboardButton("⏪ Назад", callback_data="guide_back")
 
     markup.add(row1)
     markup.add(row2)
@@ -119,9 +120,17 @@ def frequent_questions():
 
     return markup
 
-def faq_payment_problems():
+# возвращение из разделов помощи FAQ в FAQ
+def back_to_faq_keyboard():
     markup = types.InlineKeyboardMarkup()
-    row1 = types.InlineKeyboardButton("Назад ⏪", callback_data="faq_back")
+
+    target_username = "kadtalevpn_support"
+    profile_url = f"https://t.me/{target_username}"
+
+    row1 = types.InlineKeyboardButton("⏪ Назад", callback_data="faq_back")
+    row2 = types.InlineKeyboardButton("💬 Обратиться в поддержку", url=profile_url, callback_data="contact_support")
+
     markup.add(row1)
+    markup.add(row2)
 
     return markup

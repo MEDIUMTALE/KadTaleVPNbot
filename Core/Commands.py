@@ -35,13 +35,24 @@ COMMANDS = {
 }
 
 # функции обработки callback кнопок
-def help_faq(callback, bot):
+def help_faq(callback, bot): # часто задаваемые вопросы (faq)
     bot.send_message(callback.message.chat.id, "Что вас интересует?", reply_markup = frequent_questions())
     bot.delete_message(callback.message.chat.id, callback.message.message_id)
 
-def back_frequent_questions(callback, bot): # возвращение в часто задаваемые
-    bot.edit_message_text(chat_id=callback.message.chat.id, message_id=callback.message.message_id, text="Что вас интересует?", reply_markup=frequent_questions())
+def payment_problems(callback, bot): # faq - проблемы с платежами
+    bot.send_message(callback.message.chat.id, text["payment_problems_text"], reply_markup=back_to_faq_keyboard())  # Исправленное имя функции
+    bot.delete_message(callback.message.chat.id, callback.message.message_id)
 
+def low_speed_problems(callback, bot): # faq - низкая скорость
+    bot.send_message(callback.message.chat.id, text["low_speed_problems"], reply_markup=back_to_faq_keyboard())
+    bot.delete_message(callback.message.chat.id, callback.message.message_id)
+
+def vpn_no_work(callback, bot): # faq - впн не работает
+    bot.send_message(callback.message.chat.id, text["vpn_no_work"], reply_markup=back_to_faq_keyboard())
+    bot.delete_message(callback.message.chat.id, callback.message.message_id)
+
+
+# гайд меню по установке vpn на разные устройства
 def help_install(callback, bot): # меню выбора помощи по установке
     bot.send_message(callback.message.chat.id, "Выберите вашу ОС:", reply_markup = guide_menu())
     bot.delete_message(callback.message.chat.id, callback.message.message_id)
@@ -52,62 +63,53 @@ def help_android(callback, bot): # инструкция по устройств�
 
 def help_apple(callback, bot): # инструкции по устройствам apple
     bot.send_message(callback.message.chat.id, "Выберите ваше устройство Apple:", reply_markup=apple_menu())
-
     bot.delete_message(callback.message.chat.id, callback.message.message_id)
 
-# возвращение из меню выбора устроиств apple в полное меню выбора устройств
-def help_back_apple(callback, bot):
-    bot.edit_message_text(chat_id=callback.message.chat.id, message_id=callback.message.message_id, text="Выберите вашу ОС:", reply_markup=guide_menu()) # главное меню помощи
-
-def help_pc(callback, bot):
+def help_pc(callback, bot): # инструкции по компьютеру
     bot.send_message(callback.message.chat.id, "В разработке...")
-
     bot.delete_message(callback.message.chat.id, callback.message.message_id)
 
-def help_tv(callback, bot):
+def help_tv(callback, bot): # инструкция по android TV
     bot.send_message(callback.message.chat.id, "В разработке...")
-
     bot.delete_message(callback.message.chat.id, callback.message.message_id)
 
 def help_support(callback, bot):
     bot.send_message(callback.message.chat.id, "Переходим на страницу поддержки")
-
     bot.delete_message(callback.message.chat.id, callback.message.message_id)
 
-# возвращение из часто задаваемых вопросов в меню помощи
-def help_back(callback, bot):
-    bot.edit_message_text(
-        chat_id=callback.message.chat.id,
-        message_id=callback.message.message_id,
-        text= text["help_command_text"],
-        reply_markup=help_menu()  # главное меню помощи
-    )
+def help_back(callback, bot): # возвращение из часто задаваемых вопросов в меню помощи
+    bot.edit_message_text(chat_id=callback.message.chat.id,message_id=callback.message.message_id,text= text["help_command_text"],reply_markup=help_menu())  # главное меню помощи
 
-def pay_delete(callback, bot):
+def back_to_faq(callback, bot): # возвращение из пунктов faq в faq
+    bot.edit_message_text(chat_id=callback.message.chat.id, message_id=callback.message.message_id, text="Что вас интересует?", reply_markup=frequent_questions())
+
+def help_back_apple(callback, bot): # возвращение из меню выбора устроиств apple в полное меню выбора устройств
+    bot.edit_message_text(chat_id=callback.message.chat.id, message_id=callback.message.message_id, text="Выберите вашу ОС:", reply_markup=guide_menu()) # главное меню помощи
+
+def pay_delete(callback, bot): # удаление визуального сообщения для пополнения (временно)
     bot.delete_message(callback.message.chat.id, callback.message.message_id)
-
-def faq_payment_problems(callback, bot):
-    markup = types.InlineKeyboardMarkup()
-    row1 = types.InlineKeyboardButton("Назад ⏪", reply_markup=faq_payment_problems())
-    markup.add(row1)
-
-
 
 # словарь callback-кнопок
 CALLBACKS = {
-    "frequent_questions": help_faq, # часто задавемые вопросы
+    "frequent_questions": help_faq, # faq - часто задаваемые вопросы
+    "payment_problems": payment_problems, # faq - проблемы с платежом
+    "low_speed_problems" : low_speed_problems, # faq - низкая скорость vpn
+    "vpn_no_work": vpn_no_work,  # faq - vpn не работает
+
     "installation_instructions": help_install, # инструкция по установке
     "help_android": help_android, # помощь клиентам андроид
     "help_iphone": help_apple, # помощь клиентам apple (iphone, macOS, iPad)
     "help_pc": help_pc, # помощь клиентам PC (windows)
     "help_tv": help_tv, # помощь клиентам TV (Android TV)
     "contact_support": help_support, # связь с поддержкой
-    "help_back": help_back, # возвращение назад
+    "guide_back": help_back, # возвращение назад
+    "faq_back": back_to_faq, # возвращение в меню faq
     "help_back_apple": help_back_apple, # возвращение назад из меню устройств apple
-    "pay_delete": pay_delete, # удаление платежа (временно
-    "payment_problems": faq_payment_problems,
-    "faq_back": back_frequent_questions
+
+    "pay_delete": pay_delete, # удаление платежа (временно)
 }
+
+
 
 # основная обработка команд и callback кнопок
 def CommandProcessing(message=None, bot=None, callback=None):
