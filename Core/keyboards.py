@@ -118,3 +118,10 @@ def frequent_questions():
     markup.add(row5)
 
     return markup
+
+def faq_payment_problems():
+    markup = types.InlineKeyboardMarkup()
+    row1 = types.InlineKeyboardButton("Назад ⏪", callback_data="faq_back")
+    markup.add(row1)
+
+    return markup

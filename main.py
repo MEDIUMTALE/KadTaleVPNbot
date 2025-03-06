@@ -4,7 +4,7 @@ from Core.keyboards import *
 from Core.Commands import CommandProcessing  # Правильный импорт функции
 from Core.Databases import init_db  # Импорт функции инициализации базы данных
 
-# Вызов функции для инициализации базы данных и создания таблиц
+# вызов функции для инициализации базы данных и создания таблиц
 init_db()
 
 token = "7622209066:AAFoZZanqTXQZdK8fwXHqngmcOUAiUHZxpc"

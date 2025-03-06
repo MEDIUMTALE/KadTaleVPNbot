@@ -1,12 +1,8 @@
+from Core.keyboards import *  # импорт клавиатур
+from Core.Databases import add_user  # добавление пользователей
+from Core.text import text # импорт текстового массива
 
-from Core.keyboards import *  # Импорт клавиатур
-from Core.Databases import add_user  # Добавление пользователей
-from Core.text import text
-
-# Текст информации о VPN
-
-
-### 🔹 Функции обработки команд
+# функции обработки команд
 def start_command(message, bot):
     user_id = message.from_user.id
     add_user(user_id)
@@ -38,32 +34,30 @@ COMMANDS = {
     "Партнерка 🤝" : invite_friend
 }
 
-# функции обработки callback-кнопок
+# функции обработки callback кнопок
 def help_faq(callback, bot):
     bot.send_message(callback.message.chat.id, "Что вас интересует?", reply_markup = frequent_questions())
     bot.delete_message(callback.message.chat.id, callback.message.message_id)
 
-def help_install(callback, bot):
+def back_frequent_questions(callback, bot): # возвращение в часто задаваемые
+    bot.edit_message_text(chat_id=callback.message.chat.id, message_id=callback.message.message_id, text="Что вас интересует?", reply_markup=frequent_questions())
+
+def help_install(callback, bot): # меню выбора помощи по установке
     bot.send_message(callback.message.chat.id, "Выберите вашу ОС:", reply_markup = guide_menu())
     bot.delete_message(callback.message.chat.id, callback.message.message_id)
 
-def help_android(callback, bot):
+def help_android(callback, bot): # инструкция по устройствам android
     bot.send_message(callback.message.chat.id, "В разработке...")
     bot.delete_message(callback.message.chat.id, callback.message.message_id)
 
-def help_apple(callback, bot):
+def help_apple(callback, bot): # инструкции по устройствам apple
     bot.send_message(callback.message.chat.id, "Выберите ваше устройство Apple:", reply_markup=apple_menu())
 
     bot.delete_message(callback.message.chat.id, callback.message.message_id)
 
 # возвращение из меню выбора устроиств apple в полное меню выбора устройств
 def help_back_apple(callback, bot):
-    bot.edit_message_text(
-        chat_id=callback.message.chat.id,
-        message_id=callback.message.message_id,
-        text="Выберите вашу ОС:",
-        reply_markup=guide_menu()  # Главное меню помощи
-    )
+    bot.edit_message_text(chat_id=callback.message.chat.id, message_id=callback.message.message_id, text="Выберите вашу ОС:", reply_markup=guide_menu()) # главное меню помощи
 
 def help_pc(callback, bot):
     bot.send_message(callback.message.chat.id, "В разработке...")
@@ -92,6 +86,13 @@ def help_back(callback, bot):
 def pay_delete(callback, bot):
     bot.delete_message(callback.message.chat.id, callback.message.message_id)
 
+def faq_payment_problems(callback, bot):
+    markup = types.InlineKeyboardMarkup()
+    row1 = types.InlineKeyboardButton("Назад ⏪", reply_markup=faq_payment_problems())
+    markup.add(row1)
+
+
+
 # словарь callback-кнопок
 CALLBACKS = {
     "frequent_questions": help_faq, # часто задавемые вопросы
@@ -103,10 +104,12 @@ CALLBACKS = {
     "contact_support": help_support, # связь с поддержкой
     "help_back": help_back, # возвращение назад
     "help_back_apple": help_back_apple, # возвращение назад из меню устройств apple
-    "pay_delete" : pay_delete
+    "pay_delete": pay_delete, # удаление платежа (временно
+    "payment_problems": faq_payment_problems,
+    "faq_back": back_frequent_questions
 }
 
-### 🔹 Основная обработка команд и callback-кнопок
+# основная обработка команд и callback кнопок
 def CommandProcessing(message=None, bot=None, callback=None):
     if message:
         command_function = COMMANDS.get(message.text)
