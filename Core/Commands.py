@@ -35,6 +35,8 @@ COMMANDS = {
 }
 
 # функции обработки callback кнопок
+
+# FAQ кнопки
 def help_faq(callback, bot): # часто задаваемые вопросы (faq)
     bot.send_message(callback.message.chat.id, "Что вас интересует?", reply_markup = frequent_questions())
     bot.delete_message(callback.message.chat.id, callback.message.message_id)
@@ -50,6 +52,8 @@ def low_speed_problems(callback, bot): # faq - низкая скорость
 def vpn_no_work(callback, bot): # faq - впн не работает
     bot.send_message(callback.message.chat.id, text["vpn_no_work"], reply_markup=back_to_faq_keyboard())
     bot.delete_message(callback.message.chat.id, callback.message.message_id)
+
+
 
 
 # гайд меню по установке vpn на разные устройства
