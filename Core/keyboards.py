@@ -41,14 +41,14 @@ def guide_menu():
     markup = types.InlineKeyboardMarkup()
 
     url_android = "https://telegra.ph/Nastrojka-KadTaleVPN-dlya-Android-03-07"
+    url_pc = "https://telegra.ph/Nastrojka-KadTaleVPN-dlya-PK-03-07-2"
 
     # добавляем строки кнопок (аналог двумерного массива)
     row1 = [
         types.InlineKeyboardButton("🤖 Для Android", url = url_android, callback_data="help_android"),
-        types.InlineKeyboardButton("📺 Для TV (Android TV)", callback_data="help_tv")
             ]
     row2 = [types.InlineKeyboardButton("🍎 Для IOS (Iphone, IPad, MacOS)", callback_data="help_iphone")]
-    row3 = [types.InlineKeyboardButton("💻 Для ПК (Windows)", callback_data="help_pc")]
+    row3 = [types.InlineKeyboardButton("💻 Для ПК (Windows)", url = url_pc, callback_data="help_pc")]
     row4 = [types.InlineKeyboardButton("⏪ Назад", callback_data="guide_back")]
 
     # добавляем строку в клавиатуру
@@ -64,10 +64,11 @@ def apple_menu():
     markup = types.InlineKeyboardMarkup()
 
     url_iphone_and_ipad = "https://telegra.ph/Nastrojka-KadTaleVPN-dlya-IOS-IphoneIPad-03-06"
+    url_macos = "https://telegra.ph/Nastrojka-KadTaleVPN-dlya-macOS-03-07"
 
     # добавляем строки кнопок (аналог двумерного массива)
     row1 = [types.InlineKeyboardButton("📱 Для Iphone/IPad", url=url_iphone_and_ipad, callback_data="help_for_iphone"),]
-    row2 = [types.InlineKeyboardButton("🖥 Для MacOS", callback_data="help_for_macos")]
+    row2 = [types.InlineKeyboardButton("🖥 Для MacOS", url=url_macos, callback_data="help_for_macos")]
     row3 = [types.InlineKeyboardButton("⏪ Назад", callback_data="help_back_apple")]
 
 

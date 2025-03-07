@@ -73,10 +73,6 @@ def help_pc(callback, bot): # инструкции по компьютеру
     bot.send_message(callback.message.chat.id, "В разработке...")
     bot.delete_message(callback.message.chat.id, callback.message.message_id)
 
-def help_tv(callback, bot): # инструкция по android TV
-    bot.send_message(callback.message.chat.id, "В разработке...")
-    bot.delete_message(callback.message.chat.id, callback.message.message_id)
-
 def help_support(callback, bot):
     bot.send_message(callback.message.chat.id, "Переходим на страницу поддержки")
     bot.delete_message(callback.message.chat.id, callback.message.message_id)
@@ -104,7 +100,6 @@ CALLBACKS = {
     "help_android": help_android, # помощь клиентам андроид
     "help_iphone": help_apple, # помощь клиентам apple (iphone, macOS, iPad)
     "help_pc": help_pc, # помощь клиентам PC (windows)
-    "help_tv": help_tv, # помощь клиентам TV (Android TV)
     "contact_support": help_support, # связь с поддержкой
     "guide_back": help_back, # возвращение назад
     "faq_back": back_to_faq, # возвращение в меню faq
