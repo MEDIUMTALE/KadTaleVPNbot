@@ -40,9 +40,11 @@ def keyboard_balance(): # РАЗОБРАТЬСЯ С ЭТОХУЙ ХУЙНЕЙ
 def guide_menu():
     markup = types.InlineKeyboardMarkup()
 
+    url_android = "https://telegra.ph/Nastrojka-KadTaleVPN-dlya-Android-03-07"
+
     # добавляем строки кнопок (аналог двумерного массива)
     row1 = [
-        types.InlineKeyboardButton("🤖 Для Android", callback_data="help_android"),
+        types.InlineKeyboardButton("🤖 Для Android", url = url_android, callback_data="help_android"),
         types.InlineKeyboardButton("📺 Для TV (Android TV)", callback_data="help_tv")
             ]
     row2 = [types.InlineKeyboardButton("🍎 Для IOS (Iphone, IPad, MacOS)", callback_data="help_iphone")]
@@ -61,8 +63,10 @@ def guide_menu():
 def apple_menu():
     markup = types.InlineKeyboardMarkup()
 
+    url_iphone_and_ipad = "https://telegra.ph/Nastrojka-KadTaleVPN-dlya-IOS-IphoneIPad-03-06"
+
     # добавляем строки кнопок (аналог двумерного массива)
-    row1 = [types.InlineKeyboardButton("📱 Для Iphone/IPad", callback_data="help_for_iphone"),]
+    row1 = [types.InlineKeyboardButton("📱 Для Iphone/IPad", url=url_iphone_and_ipad, callback_data="help_for_iphone"),]
     row2 = [types.InlineKeyboardButton("🖥 Для MacOS", callback_data="help_for_macos")]
     row3 = [types.InlineKeyboardButton("⏪ Назад", callback_data="help_back_apple")]
 
