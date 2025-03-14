@@ -24,11 +24,31 @@ def back_command(message, bot):
 def invite_friend(message, bot):
     bot.send_message(message.chat.id, "Вы можете пригласить друга, и вы оба получите вознаграждение! (в разработке)")
 
+def vpn_key(message, bot):
+    bot.send_message(message.chat.id, "Api Key Error")
+
+def user_balance(message, bot):
+        user_id = message.from_user.id
+        print(user_id)
+        connection = sqlite3.connect('vpn_bot.db')
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
+        results = cursor.fetchall()
+        connection.close()
+        
+        for row in results:
+            bot.send_message(message.chat.id, f"Ваш Баланс: {row[2]}р 💸")
+            print(row[2])
+
+        
+
 # словарь команд
 COMMANDS = {
     "/start": start_command,
     "Информация о VPN 📜": info_vpn_command,
+    "Получить Ключ 🔑": vpn_key,
     "Пополнить баланс 💰️": buy_subscription_command,
+    "Баланс 🏦": user_balance,
     "Помощь 🛟": help_command,
     "Назад ⏪": back_command,
     "Партнерка 🤝" : invite_friend

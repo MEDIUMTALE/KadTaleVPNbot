@@ -7,19 +7,21 @@ def keyboard_start():
 
     # добавляем строки кнопок
     row1 = [types.KeyboardButton("Информация о VPN 📜")]
-    row2 = [
+    row2 = [types.KeyboardButton("Получить Ключ 🔑")]
+    row3 = [
         types.KeyboardButton("Пополнить баланс 💰️"), types.KeyboardButton("Баланс 🏦")
     ]
-    row3 = [
+    row4 = [
         types.KeyboardButton("Помощь 🛟")
     ]
-    row4 = [types.KeyboardButton("Партнерка 🤝")]
+    row5 = [types.KeyboardButton("Партнерка 🤝")]
 
     # добавляем строки в клавиатуру
     markup.add(*row1)
     markup.add(*row2)
     markup.add(*row3)
     markup.add(*row4)
+    markup.add(*row5)
 
     return markup
 
