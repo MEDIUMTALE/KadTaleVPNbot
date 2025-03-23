@@ -65,6 +65,7 @@ async def fetch_data():
 
                         connection = sqlite3.connect('vpn_bot.db')
                         cursor = connection.cursor()
+                        
                         cursor.execute('''
                             INSERT OR IGNORE INTO logs (type, text, date)
                             VALUES (?, ?, ?)
