@@ -37,7 +37,7 @@ def user_balance(message, bot):
         connection.close()
         
         for row in results:
-            bot.send_message(message.chat.id, f"Ваш Баланс: {row[2]}р 💸")
+            bot.send_message(message.chat.id, f"Ваш Баланс: {row[1]}р 💸")
             print(row[2])
 
         

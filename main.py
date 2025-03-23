@@ -4,7 +4,9 @@ import sqlite3
 from datetime import datetime
 import asyncio
 import threading
+
 from Core.Databases import *
+from Core.MarazbanFunctions import *
 
 # вызов функции для инициализации базы данных и создания таблиц
 #init_db()
@@ -21,7 +23,7 @@ def handle_buttons(message):
 def callback_message(callback):
     CommandProcessing(callback=callback, bot=bot)  # передаем callback
 
-def fetch_data():
+async def fetch_data():
     connection = sqlite3.connect('vpn_bot.db')
     cursor = connection.cursor()
     cursor.execute("SELECT date FROM settings WHERE id = ?", (0,))
@@ -70,6 +72,11 @@ def fetch_data():
                         connection.commit()
                         cursor.execute("UPDATE users SET balance = ? WHERE user_id = ?", (balance ,row[0]))
                         connection.commit()
+
+                        if(info_user(row[0], 1)==0):
+                            await mDelUser(row[0])
+                            print(f"User id Dell{row[0]}")
+
                         connection.close()
 
             else:
@@ -81,7 +88,7 @@ def fetch_data():
 
 async def run_periodically():
     while True:
-        fetch_data()  # Выполняем действие
+        await fetch_data()  # Выполняем действие
         await asyncio.sleep(60)  # Ждём 60 секунд
 
 
@@ -94,7 +101,7 @@ async def main():
     # Запускаем бота в отдельном потоке
     bot_thread = threading.Thread(target=run_bot)
     bot_thread.start()
-
+    
     # Запускаем периодическую задачу
     await run_periodically()  # Используем await для вызова корутины
 

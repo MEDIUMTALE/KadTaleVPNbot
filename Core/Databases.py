@@ -1,5 +1,9 @@
 import sqlite3
 from datetime import datetime
+import threading
+import asyncio
+
+from Core.MarazbanFunctions import *
 
 now = datetime.now()
 day = now.day
@@ -24,15 +28,17 @@ def add_user(user_id):
 
         # Вставляем пользователя, если его еще нет
         cursor.execute('''
-            INSERT OR IGNORE INTO users (user_id, has_trial, balance)
+            INSERT OR IGNORE INTO users (user_id, balance, key)
             VALUES (?, ?, ?)
-        ''', (user_id, False, 0))
+        ''', (user_id, 15, 0))
         conn.commit()
         cursor.execute('''
             INSERT OR IGNORE INTO logs (type, text, date)
             VALUES (?, ?, ?)
         ''', ("Registration", f"user_id: {user_id}, user_id: '{user_id}' зарегистрировался", f"{day}.{mon}.{year}-{h}:{m}"))
         conn.commit()
+
+        asyncio.run(mAddUser(user_id))
 
     conn.close()
 
