@@ -35,6 +35,7 @@ async def fetch_data():
                 h = now.hour
                 m = now.minute
 
+
                 if row[0] != day:
                     await cursor.execute("UPDATE settings SET date = ? WHERE id = 0", (day,))
                     await connection.commit()
@@ -63,9 +64,24 @@ async def fetch_data():
                             await cursor.execute("UPDATE users SET balance = ? WHERE user_id = ?", (balance, user_row[0]))
                             await connection.commit()
 
+
                             if await info_user(user_row[0], 1) == 0:
                                 #await mDelUser(user_row[0])
                                 print(f"User id Dell {user_row[0]}")
+                            
+                            #Уведомления
+                            balance = await info_user(user_row[0], 1)
+                            tariff = await info_settings(2)
+
+                            days_left = balance / tariff if tariff != 0 else 0
+                                            
+                            print(f"days_left {days_left}")
+
+                            if days_left >= 1 and days_left!=0:
+                                await bot.send_message(user_row[0], f"❗❗ У вас осталось {days_left:.0f} дней ❗❗\n\n🚨 Не забудьте продлить тариф 🚨")
+                            elif days_left==0:
+                                await bot.send_message(user_row[0], f"❗❗ У вас осталось закончился тариф ❗❗\n\n🚨 Продлейте тариф 🚨")
+                            #
 
                 else:
                     print("День совпадает")

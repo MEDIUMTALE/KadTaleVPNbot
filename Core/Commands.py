@@ -12,8 +12,8 @@ from telebot import types as async_types
 async def start_command(message, bot):
     user_id = message.from_user.id
     await add_user(user_id)
-    await bot.send_message(message.chat.id, "Вы зарегистрированы!", reply_markup=keyboard_start())
-    await bot.send_message(message.chat.id, "Привет! Выбери один из вариантов ниже:", reply_markup=keyboard_start())
+    await bot.send_message(message.chat.id, "Вы зарегистрированы!", reply_markup=await keyboard_start(user_id))
+    await bot.send_message(message.chat.id, "Привет! Выбери один из вариантов ниже:", reply_markup=await keyboard_start(user_id))
 
 async def info_vpn_command(message, bot):
     await bot.send_message(message.chat.id, text["info_vpn_command_text"])
@@ -25,7 +25,7 @@ async def help_command(message, bot):
     await bot.send_message(message.chat.id, text["help_command_text"], reply_markup=help_menu())
 
 async def back_command(message, bot):
-    await bot.send_message(message.chat.id, "Выбери один из вариантов ниже:", reply_markup=keyboard_start())
+    await bot.send_message(message.chat.id, "Выбери один из вариантов ниже:", reply_markup=await keyboard_start(message.from_user.id))
 
 async def invite_friend(message, bot):
     await bot.send_message(message.chat.id, "Вы можете пригласить друга, и вы оба получите вознаграждение! (в разработке)")
@@ -54,11 +54,35 @@ async def user_balance(message, bot):
             print(row[2])
     """
 
+async def info_tariff(message, bot):
+    user_id = message.from_user.id
+    
+    balance = await info_user(user_id, 1)
+    tariff = await info_settings(2)
+
+    days_left = balance / tariff if tariff != 0 else 0
+
+    if days_left <= 1:
+        indicator = "🔴"
+    elif days_left == 2:
+        indicator = "🟡"
+    else:
+        indicator = "🟢"
+
+    await bot.send_message(
+        message.chat.id, 
+        f"Ваш Баланс: {balance}р 💸\n\n"
+        f"Тариф Day: {tariff}р в день🏷️\n\n"
+        #f"Осталось: {days_left} Дней🟢"
+        f"Осталось: {days_left:.0f} Дней{indicator}"
+    )
+2
 # Словарь команд (теперь хранит асинхронные функции)
 COMMANDS = {
     "/start": start_command,
     "Информация о VPN 📜": info_vpn_command,
     "Получить Ключ 🔑": vpn_key,
+    "Информация о тарифе 📋": info_tariff,
     "Пополнить баланс 💰️": buy_subscription_command,
     "Баланс 🏦": user_balance,
     "Помощь 🛟": help_command,
@@ -154,11 +178,11 @@ async def CommandProcessing(message=None, bot=None, callback=None):
         if command_function:
             await command_function(message, bot)
         else:
-            await bot.send_message(message.chat.id, "В разработке...")
+            await bot.send_message(message.chat.id, "В разработке...", reply_markup=await keyboard_start(message.from_user.id))
 
     elif callback and callback.message:
         callback_function = CALLBACKS.get(callback.data)
         if callback_function:
             await callback_function(callback, bot)
         else:
-            await bot.send_message(callback.message.chat.id, "В разработке...")
+            await bot.send_message(callback.message.chat.id, "В разработке...", reply_markup=await keyboard_start(message.from_user.id))

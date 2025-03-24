@@ -1,13 +1,15 @@
 from telebot import types
 import sqlite3
 
+from Core.Databases import info_user
 
-def keyboard_start():
+async def keyboard_start(user_id):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)  # resize_keyboard=True аналогично C# ResizeKeyboard = true
 
     # добавляем строки кнопок
     row1 = [types.KeyboardButton("Информация о VPN 📜")]
     row2 = [types.KeyboardButton("Получить Ключ 🔑")]
+    row21 = [types.KeyboardButton("Информация о тарифе 📋")]
     row3 = [
         types.KeyboardButton("Пополнить баланс 💰️"), types.KeyboardButton("Баланс 🏦")
     ]
@@ -19,6 +21,9 @@ def keyboard_start():
     # добавляем строки в клавиатуру
     markup.add(*row1)
     markup.add(*row2)
+    if (await info_user(user_id, 1) != 0):
+            markup.add(*row21)
+
     markup.add(*row3)
     markup.add(*row4)
     markup.add(*row5)
