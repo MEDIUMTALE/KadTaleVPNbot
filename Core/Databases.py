@@ -67,3 +67,11 @@ async def add_logs(type, text):
             ''', (f"{type}", f"{text}", date_str))
             
         await conn.commit()
+
+
+async def user_chage_Balance(user_id, value):
+    async with aiosqlite.connect('vpn_bot.db') as conn:
+        cursor = await conn.cursor()
+        #await cursor.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
+        await cursor.execute("UPDATE users SET balance = ? WHERE user_id = ?", (value, user_id))
+        await conn.commit()

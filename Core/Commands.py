@@ -1,11 +1,19 @@
+
 import aiosqlite
+
+import asyncio
+
 from telebot.async_telebot import AsyncTeleBot
+from telebot.types import LabeledPrice, Message
+from telebot import types as async_types
+
 from Core.keyboards import *
 from Core.Databases import info_settings, info_user, add_user
 from Core.text import text
-from Core.MarazbanFunctions import mGetKayUser  # Добавьте этот импорт
+from Core.MarazbanFunctions import mGetKayUser, get_token, api # Добавьте этот импорт
 
-from telebot import types as async_types
+from Core.YooKassa import send_invoice_to_user
+
 
 # Асинхронные функции обработки команд
 
@@ -19,7 +27,22 @@ async def info_vpn_command(message, bot):
     await bot.send_message(message.chat.id, text["info_vpn_command_text"])
 
 async def buy_subscription_command(message, bot):
-    await bot.send_message(message.chat.id, text["buy_subscription_command_text"], reply_markup=purchase_a_subscription())
+    #await bot.send_message(message.chat.id, text["buy_subscription_command_text"], reply_markup=purchase_a_subscription())
+    await bot.send_message(message.chat.id, "Для пополнения щёта используйте комманду /buy 'Сумма пополнения'")
+
+async def buy_summa_balance(message, bot):
+    textAr = message.text.split()
+    user_id = message.from_user.id
+
+    money = int(textAr[1]) * 100
+    print(f"mony :::: {money}")
+    if await info_user(user_id, 0):  # Если пользователь уже существует
+        await send_invoice_to_user(message, bot, money)
+        return
+    else:
+        print("Pay Usera нет в бд")
+        await bot.send_message(message.chat.id, "Вас нету в системе :(\nЗарегистрируйтесь нажав /start")
+
 
 async def help_command(message, bot):
     await bot.send_message(message.chat.id, text["help_command_text"], reply_markup=help_menu())
@@ -41,7 +64,41 @@ async def user_balance(message, bot):
     user_id = message.from_user.id
     print(user_id)
 
-    await bot.send_message(message.chat.id, f"Ваш Баланс: {await info_user(user_id, 1)}р 💸")
+
+    if (await info_user(user_id, 1) != 0):
+        
+        # Получаем токен
+        token = await get_token()
+        if not hasattr(token, "access_token"):
+            print("Ошибка: токен не содержит access_token")
+            return
+
+        user_info = await api.get_user(username=f"{user_id}", token=token.access_token)
+
+
+
+        balance = await info_user(user_id, 1)
+        tariff = await info_settings(2)
+
+        days_left = balance / tariff if tariff != 0 else 0
+
+        if days_left <= 1:
+            indicator = "🔴"
+        elif days_left == 2:
+            indicator = "🟡"
+        else:
+            indicator = "🟢"
+
+        await bot.send_message(
+            message.chat.id, 
+            f"Ваш Баланс: {balance}р 💸\n\n"
+            f"Тариф Day: {tariff}р в день🏷️\n\n"
+            f"Осталось: {days_left:.0f} Дней{indicator}"
+        )
+    
+    else:
+        await bot.send_message(message.chat.id, f"Ваш Баланс: {await info_user(user_id, 1)}р 💸")
+
 
     """
     async with aiosqlite.connect('vpn_bot.db') as connection:
@@ -54,6 +111,7 @@ async def user_balance(message, bot):
             print(row[2])
     """
 
+"""
 async def info_tariff(message, bot):
     user_id = message.from_user.id
     
@@ -76,13 +134,17 @@ async def info_tariff(message, bot):
         #f"Осталось: {days_left} Дней🟢"
         f"Осталось: {days_left:.0f} Дней{indicator}"
     )
-2
+"""
+
+
+
+
 # Словарь команд (теперь хранит асинхронные функции)
 COMMANDS = {
     "/start": start_command,
+    "/buy": buy_summa_balance,
     "Информация о VPN 📜": info_vpn_command,
     "Получить Ключ 🔑": vpn_key,
-    "Информация о тарифе 📋": info_tariff,
     "Пополнить баланс 💰️": buy_subscription_command,
     "Баланс 🏦": user_balance,
     "Помощь 🛟": help_command,
@@ -178,7 +240,12 @@ async def CommandProcessing(message=None, bot=None, callback=None):
         if command_function:
             await command_function(message, bot)
         else:
-            await bot.send_message(message.chat.id, "В разработке...", reply_markup=await keyboard_start(message.from_user.id))
+            text = message.text.split()
+            command_function = COMMANDS.get(text[0])
+            if(command_function):
+                await command_function(message, bot)
+            else:
+                await bot.send_message(message.chat.id, "В разработке...", reply_markup=await keyboard_start(message.from_user.id))
 
     elif callback and callback.message:
         callback_function = CALLBACKS.get(callback.data)

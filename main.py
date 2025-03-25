@@ -1,14 +1,58 @@
 import asyncio
 from datetime import datetime
 import aiosqlite  # Асинхронная замена для sqlite3
+
 from telebot.async_telebot import AsyncTeleBot  # Асинхронная версия telebot
+from telebot.types import LabeledPrice, Message
+from telebot import types
 
 from Core.Commands import CommandProcessing
 from Core.Databases import *
 from Core.MarazbanFunctions import *
 
 token = "7622209066:AAFoZZanqTXQZdK8fwXHqngmcOUAiUHZxpc"
+#token = "6120629335:AAF8ERXPC7rCzWccZbKwi1WxODAzqBPObx8"
 bot = AsyncTeleBot(token)
+
+
+
+
+#Bye
+payment_status = {}
+
+@bot.pre_checkout_query_handler(func=lambda query: True)
+async def process_pre_checkout_query(pre_checkout_query: types.PreCheckoutQuery):
+    # Подтверждаем предварительный запрос
+    await bot.answer_pre_checkout_query(
+        pre_checkout_query.id,
+        ok=True,
+        error_message="Ошибка при проверке платежа"
+    )
+    print(f"Предварительная проверка платежа: {pre_checkout_query.id}")
+
+@bot.message_handler(content_types=['successful_payment'])
+async def process_successful_payment(message: Message):
+    payment_info = message.successful_payment
+    payment_status[message.chat.id] = True
+    
+    print(f"Платеж успешен! ID: {payment_info.provider_payment_charge_id}")
+    print(f"Сумма: {payment_info.total_amount / 100} {payment_info.currency}")
+    
+    await bot.send_message(
+        message.chat.id,
+        "✅ Платеж успешно завершен! Спасибо за покупку.\n"
+        #f"ID платежа: {payment_info.provider_payment_charge_id}\n"
+        f"Сумма пополнения: {int(payment_info.total_amount / 100)} {payment_info.currency}"
+    )
+    balance = await info_user(message.from_user.id, 1) + int(payment_info.total_amount / 100)
+    print(balance)
+    await user_chage_Balance(message.from_user.id, balance)
+
+
+
+
+
+
 
 # Обработчик сообщений
 @bot.message_handler(func=lambda message: True)
@@ -69,19 +113,21 @@ async def fetch_data():
                                 #await mDelUser(user_row[0])
                                 print(f"User id Dell {user_row[0]}")
                             
-                            #Уведомления
-                            balance = await info_user(user_row[0], 1)
-                            tariff = await info_settings(2)
+                                #Уведомления
+                                balance = await info_user(user_row[0], 1)
+                                tariff = await info_settings(2)
 
-                            days_left = balance / tariff if tariff != 0 else 0
-                                            
-                            print(f"days_left {days_left}")
+                                days_left = balance / tariff if tariff != 0 else 0
+                                                
+                                print(f"days_left {days_left}")
 
-                            if days_left >= 1 and days_left!=0:
-                                await bot.send_message(user_row[0], f"❗❗ У вас осталось {days_left:.0f} дней ❗❗\n\n🚨 Не забудьте продлить тариф 🚨")
-                            elif days_left==0:
-                                await bot.send_message(user_row[0], f"❗❗ У вас осталось закончился тариф ❗❗\n\n🚨 Продлейте тариф 🚨")
-                            #
+                                if days_left >= 1 and days_left!=0:
+                                    print(f"Message To Id{user_row[0]}")
+                                    await bot.send_message(user_row[0], f"❗❗ У вас осталось {days_left:.0f} дней ❗❗\n\n🚨 Не забудьте продлить тариф 🚨")
+                                elif days_left==0:
+                                    print(f"ЫMessage To Id{user_row[0]}")
+                                    await bot.send_message(user_row[0], f"❗❗ У вас осталось закончился тариф ❗❗\n\n🚨 Продлейте тариф 🚨")
+                                #
 
                 else:
                     print("День совпадает")

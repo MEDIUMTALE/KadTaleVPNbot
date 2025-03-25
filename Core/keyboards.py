@@ -9,7 +9,6 @@ async def keyboard_start(user_id):
     # добавляем строки кнопок
     row1 = [types.KeyboardButton("Информация о VPN 📜")]
     row2 = [types.KeyboardButton("Получить Ключ 🔑")]
-    row21 = [types.KeyboardButton("Информация о тарифе 📋")]
     row3 = [
         types.KeyboardButton("Пополнить баланс 💰️"), types.KeyboardButton("Баланс 🏦")
     ]
@@ -21,9 +20,6 @@ async def keyboard_start(user_id):
     # добавляем строки в клавиатуру
     markup.add(*row1)
     markup.add(*row2)
-    if (await info_user(user_id, 1) != 0):
-            markup.add(*row21)
-
     markup.add(*row3)
     markup.add(*row4)
     markup.add(*row5)
