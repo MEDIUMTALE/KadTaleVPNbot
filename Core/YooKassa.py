@@ -1,33 +1,77 @@
-from telebot import types
-from telebot.types import LabeledPrice, Message
-from telebot.async_telebot import AsyncTeleBot
 import asyncio
+from yookassa import Payment, Configuration
+import uuid
+from telebot import types
+from telebot.async_telebot import AsyncTeleBot
 
-payment_status = {}
+# Настройки ЮKassa
+YOOKASSA_SHOP_ID = "1046269"
+YOOKASSA_SECRET_KEY = "live_HMstD4JMz_kYwfQr6u3r7MCeUXhV-Off_QdVHXwiEug"
+Configuration.account_id = YOOKASSA_SHOP_ID
+Configuration.secret_key = YOOKASSA_SECRET_KEY
 
-async def send_invoice_to_user(message, bot, amount_rub):
-    provider_token = '390540012:LIVE:67574'  # Замените на реальный!
-    prices = [LabeledPrice(label="Пополнение баланса", amount=int(amount_rub))]
-
+async def send_payment_sbp(message: types.Message, bot: AsyncTeleBot, amount: float):
+    """Создание платежа через СБП"""
     try:
-        await bot.send_invoice(
-            chat_id=message.chat.id,
-            title='Пополнение баланса VPN',
-            description=f'Пополнение на {amount_rub} руб',
-            invoice_payload=f'balance_{message.from_user.id}',
-            provider_token=provider_token,
-            currency='rub',
-            prices=prices,
-            is_flexible=False,
-            start_parameter=f'balance_{amount_rub}'
+        chat_id = message.chat.id
+        user_id = message.from_user.id  # Добавляем user_id для metadata
+        
+        # Создаем платеж
+        idempotence_key = str(uuid.uuid4())
+        payment = Payment.create({
+            "amount": {
+                "value": f"{amount:.2f}",
+                "currency": "RUB"
+            },
+            "payment_method_data": {"type": "bank_card"},
+            "confirmation": {
+                "type": "redirect",
+                "return_url": "https://t.me/"
+            },
+            "capture": True,
+            "description": "Пополнение баланса",
+            "metadata": {
+                "chat_id": chat_id,
+                "user_id": user_id  # Добавляем user_id
+            }
+        }, idempotence_key)
+
+        # Создаем кнопки
+        markup = types.InlineKeyboardMarkup()
+        markup.row(
+            types.InlineKeyboardButton(
+                text="💳 Оплатить через СБП",
+                url=payment.confirmation.confirmation_url
+            )
         )
-        print(f"Инвойс отправлен для {message.from_user.id}")
-        return True
+        markup.row(
+            types.InlineKeyboardButton(
+                text="🔄 Проверить оплату",
+                callback_data=f"check_{payment.id}"
+            )
+        )
+
+        await bot.send_message(
+            chat_id=chat_id,
+            text=f"✅ Для оплаты {amount} руб. нажмите кнопку ниже:",
+            reply_markup=markup
+        )
+
+        return payment
+
     except Exception as e:
-        error_text = (
-            "⚠️ Не удалось создать платёж. "
-            "Попробуйте позже или свяжитесь с поддержкой."
+        print(f"Ошибка при создании платежа: {e}")
+        await bot.send_message(
+            chat_id=message.chat.id,
+            text="❌ Произошла ошибка при создании платежа. Попробуйте позже."
         )
-        await bot.send_message(message.chat.id, error_text)
-        print(f"Ошибка платежа: {e}")
-        return False
+        return None
+
+async def check_payment_status(payment_id: str) -> str:
+    """Проверка статуса платежа"""
+    try:
+        payment = Payment.find_one(payment_id)
+        return payment.status
+    except Exception as e:
+        print(f"Ошибка проверки платежа: {e}")
+        return None

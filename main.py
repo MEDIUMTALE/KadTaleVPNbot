@@ -10,6 +10,9 @@ from Core.Commands import CommandProcessing
 from Core.Databases import *
 from Core.MarazbanFunctions import *
 
+from Core.YooKassa import check_payment_status
+from yookassa import Payment
+
 token = "7622209066:AAFoZZanqTXQZdK8fwXHqngmcOUAiUHZxpc"
 #token = "6120629335:AAF8ERXPC7rCzWccZbKwi1WxODAzqBPObx8"
 bot = AsyncTeleBot(token)
@@ -17,37 +20,66 @@ bot = AsyncTeleBot(token)
 
 
 
-#Bye
-payment_status = {}
 
-@bot.pre_checkout_query_handler(func=lambda query: True)
-async def process_pre_checkout_query(pre_checkout_query: types.PreCheckoutQuery):
-    # Подтверждаем предварительный запрос
-    await bot.answer_pre_checkout_query(
-        pre_checkout_query.id,
-        ok=True,
-        error_message="Ошибка при проверке платежа"
-    )
-    print(f"Предварительная проверка платежа: {pre_checkout_query.id}")
+#обработчик облаты
+@bot.callback_query_handler(func=lambda call: call.data.startswith('check_'))
+async def check_payment_callback(call: types.CallbackQuery):
+    """Обработчик проверки платежа"""
+    try:
+        if not call or not call.message:
+            return
 
-@bot.message_handler(content_types=['successful_payment'])
-async def process_successful_payment(message: Message):
-    payment_info = message.successful_payment
-    payment_status[message.chat.id] = True
-    
-    print(f"Платеж успешен! ID: {payment_info.provider_payment_charge_id}")
-    print(f"Сумма: {payment_info.total_amount / 100} {payment_info.currency}")
-    
-    await bot.send_message(
-        message.chat.id,
-        "✅ Платеж успешно завершен! Спасибо за покупку.\n"
-        #f"ID платежа: {payment_info.provider_payment_charge_id}\n"
-        f"Сумма пополнения: {int(payment_info.total_amount / 100)} {payment_info.currency}"
-    )
-    balance = await info_user(message.from_user.id, 1) + int(payment_info.total_amount / 100)
-    print(balance)
-    await user_chage_Balance(message.from_user.id, balance)
+        payment_id = call.data.split('_')[1]
+        chat_id = call.message.chat.id
+        #user_id = call.message.from_user.id
+        
+        payment = Payment.find_one(payment_id)
 
+        amout = payment.amount.value
+        
+        metadata = getattr(payment, 'metadata', None)  # Безопасное получение metadata
+
+        user_id = payment.metadata.get('user_id')
+
+        # Отвечаем на callback
+        await bot.answer_callback_query(call.id)
+
+        # Проверяем статус
+        status = await check_payment_status(payment_id)
+        
+        print(user_id)
+
+        if status == "succeeded":
+            await bot.send_message(
+                chat_id,
+                "✅ Платеж успешно завершен! Баланс пополнен."
+            )
+
+
+            balance = await info_user(user_id, 1) + int(amout)
+            print(balance)
+            await user_chage_Balance(user_id, balance)
+            
+        elif status == "pending":
+            await bot.send_message(
+                chat_id,
+                "⌛ Платеж еще обрабатывается. Попробуйте позже."
+            )
+        else:
+            await bot.send_message(
+                chat_id,
+                "❌ Платеж не был завершен или произошла ошибка."
+            )
+
+    except Exception as e:
+        print(f"Ошибка в обработчике callback: {e}")
+        try:
+            await bot.send_message(
+                chat_id,
+                "⚠️ Произошла ошибка при проверке платежа."
+            )
+        except:
+            pass
 
 
 

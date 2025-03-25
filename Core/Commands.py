@@ -10,9 +10,9 @@ from telebot import types as async_types
 from Core.keyboards import *
 from Core.Databases import info_settings, info_user, add_user
 from Core.text import text
-from Core.MarazbanFunctions import mGetKayUser, get_token, api # Добавьте этот импорт
+from Core.MarazbanFunctions import mGetKayUser, get_token, api, mGet_Data_Info_User # Добавьте этот импорт
 
-from Core.YooKassa import send_invoice_to_user
+from Core.YooKassa import send_payment_sbp
 
 
 # Асинхронные функции обработки команд
@@ -34,20 +34,21 @@ async def pay_summa_balance(message, bot):
     textAr = message.text.split()
     user_id = message.from_user.id
 
-    if len(textAr) < 2:
+    if len(textAr) < 0:
         await bot.send_message(user_id, "❌ Ошибка: команда должна содержать сумму. Пример: /pay 60")
         return
     
         
     money = int(textAr[1]) * 100
 
-    if int(textAr[1])<60:
+    if int(textAr[1])<1:
         await bot.send_message(user_id, "❌ Ошибка: минимальная сумма пополнения 60р. Пример: /pay 60")
         return
     
     print(f"mony :::: {money}")
     if await info_user(user_id, 0):  # Если пользователь уже существует
-        await send_invoice_to_user(message, bot, money)
+        await send_payment_sbp(message, bot, int(textAr[1]))
+        #await send_invoice_to_user(message, bot, money)
         return
     else:
         print("Pay Usera нет в бд")
@@ -103,8 +104,9 @@ async def user_balance(message, bot):
         await bot.send_message(
             message.chat.id, 
             f"Ваш Баланс: {balance}р 💸\n\n"
-            f"Тариф Day: {tariff}р в день🏷️\n\n"
-            f"Осталось: {days_left:.0f} Дней{indicator}"
+            f"Тариф Day: {tariff}р в день 🏷️\n\n"
+            f"Осталось: {days_left:.0f} Дней {indicator}\n\n"
+            f"{await mGet_Data_Info_User(user_id)} 📶\n\n"
         )
     
     else:
@@ -226,6 +228,16 @@ async def help_back_apple(callback, bot):
 
 async def pay_delete(callback, bot):
     await bot.delete_message(callback.message.chat.id, callback.message.message_id)
+
+"""
+async def check_handler(callback, bot):
+    print("CALLL BAAAK")
+    result = check(callback.data.split('_')[-1])
+    if result:
+        await callback.message.answer('Оплата не прошла, или произошла ошибка')
+    else:
+        await callback.message.answer('Оплата прошла успешно!')
+"""
 
 # Словарь callback-кнопок (теперь хранит асинхронные функции)
 CALLBACKS = {

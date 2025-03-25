@@ -98,6 +98,28 @@ async def mChangeStatusUser(user_id):
     except Exception as e:
         print(f"Ошибка при добавлении пользователя: {e}")
 
+async def mGet_Data_Info_User(user_id):
+        # Получаем токен
+        token = await get_token()
+        if not hasattr(token, "access_token"):
+            print("Ошибка: токен не содержит access_token")
+            return
+
+        user_info = await api.get_user(username=f"{user_id}", token=token.access_token)
+
+        user_UseData = round(user_info.used_traffic / 1073741824, 2)
+
+        print(user_info.data_limit)
+
+        if user_info.data_limit is None:
+            user_DataLimit = "∞"
+            
+        else:
+            print(user_info.data_limit)
+            user_DataLimit = round(user_info.data_limit / 1073741824, 2)
+
+        return f"Вы потратили: {user_UseData} GB из {user_DataLimit} GB"
+
 
 #asyncio.run(mAddUser("1324016724"))
 #asyncio.run(mDelUser("1324016724"))
