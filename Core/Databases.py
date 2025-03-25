@@ -1,3 +1,4 @@
+import asyncio
 import aiosqlite
 from datetime import datetime
 
@@ -73,5 +74,7 @@ async def user_chage_Balance(user_id, value):
     async with aiosqlite.connect('vpn_bot.db') as conn:
         cursor = await conn.cursor()
         #await cursor.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
-        await cursor.execute("UPDATE users SET balance = ? WHERE user_id = ?", (value, user_id))
+        await cursor.execute("UPDATE users SET balance = ? WHERE user_id = ?", (value * await info_settings(4), user_id))
         await conn.commit()
+
+#asyncio.run(user_chage_Balance(1324016724, 1))
