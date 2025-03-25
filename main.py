@@ -148,7 +148,7 @@ async def fetch_data():
 
 
                             if await info_user(user_row[0], 1) == 0:
-                                #await mDelUser(user_row[0])
+                                await mDelUser(user_row[0])
                                 print(f"User id Dell {user_row[0]}")
                             
                                 #Уведомления
