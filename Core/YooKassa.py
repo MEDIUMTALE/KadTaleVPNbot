@@ -5,34 +5,29 @@ import asyncio
 
 payment_status = {}
 
-async def send_invoice_to_user(message, bot, money):
-    provider_token = '390540012:LIVE:67574'
-    #provider_token = '1744374395:TEST:dac3822bb9afd4c099e4'
-    prices = [
-        LabeledPrice(label='Пополнение баланса VPN', amount=money),
-    ]
-    
+async def send_invoice_to_user(message, bot, amount_rub):
+    provider_token = 'ВАШ_РЕАЛЬНЫЙ_ТОКЕН'  # Замените на реальный!
+    prices = [LabeledPrice(label="Пополнение баланса", amount=int(amount_rub * 100))]
+
     try:
         await bot.send_invoice(
             chat_id=message.chat.id,
             title='Пополнение баланса VPN',
-            description='Пополнение баланса VPN',
-            invoice_payload='add_bolance',
+            description=f'Пополнение на {amount_rub} руб',
+            invoice_payload=f'balance_{message.from_user.id}',
             provider_token=provider_token,
             currency='rub',
             prices=prices,
             is_flexible=False,
-            start_parameter='add_bolance'
+            start_parameter=f'balance_{amount_rub}'
         )
-        print("Инвойс отправлен. Ожидаем оплату...")
-        
-        # Ждем подтверждения оплаты (таймаут 15 минут)
-        for _ in range(90):
-            await asyncio.sleep(10)
-            if payment_status.get(message.chat.id, False):
-                return True
-        return False
-        
+        print(f"Инвойс отправлен для {message.from_user.id}")
+        return True
     except Exception as e:
-        print(f"Ошибка при отправке инвойса: {e}")
+        error_text = (
+            "⚠️ Не удалось создать платёж. "
+            "Попробуйте позже или свяжитесь с поддержкой."
+        )
+        await bot.send_message(message.chat.id, error_text)
+        print(f"Ошибка платежа: {e}")
         return False
