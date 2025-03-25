@@ -8,7 +8,7 @@ from telebot.types import LabeledPrice, Message
 from telebot import types as async_types
 
 from Core.keyboards import *
-from Core.Databases import info_settings, info_user, add_user
+from Core.Databases import info_settings, info_user, add_user, existence_user
 from Core.text import text
 from Core.MarazbanFunctions import mGetKayUser, get_token, api, mGet_Data_Info_User # Добавьте этот импорт
 
@@ -78,40 +78,44 @@ async def user_balance(message, bot):
     print(user_id)
 
 
-    if (await info_user(user_id, 1) != 0):
+    if (await existence_user(user_id) != False):
         
-        # Получаем токен
-        token = await get_token()
-        if not hasattr(token, "access_token"):
-            print("Ошибка: токен не содержит access_token")
-            return
+        if (await info_user(user_id, 1) != 0):
+            # Получаем токен
+            token = await get_token()
+            if not hasattr(token, "access_token"):
+                print("Ошибка: токен не содержит access_token")
+                return
 
-        user_info = await api.get_user(username=f"{user_id}", token=token.access_token)
+            #user_info = await api.get_user(username=f"{user_id}", token=token.access_token)
 
 
 
-        balance = await info_user(user_id, 1)
-        tariff = await info_settings(2)
+            balance = await info_user(user_id, 1)
+            tariff = await info_settings(2)
 
-        days_left = balance / tariff if tariff != 0 else 0
+            days_left = balance / tariff if tariff != 0 else 0
 
-        if days_left <= 1:
-            indicator = "🔴"
-        elif days_left == 2:
-            indicator = "🟡"
-        else:
-            indicator = "🟢"
+            if days_left <= 1:
+                indicator = "🔴"
+            elif days_left == 2:
+                indicator = "🟡"
+            else:
+                indicator = "🟢"
 
-        await bot.send_message(
-            message.chat.id, 
-            f"Ваш Баланс: {balance}р 💸\n\n"
-            f"Тариф Day: {tariff}р в день 🏷️\n\n"
-            f"Осталось: {days_left:.0f} Дней {indicator}\n\n"
-            f"{await mGet_Data_Info_User(user_id)} 📶\n\n"
-        )
+            await bot.send_message(
+                message.chat.id, 
+                f"Ваш Баланс: {balance}р 💸\n\n"
+                f"Тариф Day: {tariff}р в день 🏷️\n\n"
+                f"Осталось: {days_left:.0f} Дней {indicator}\n\n"
+                f"{await mGet_Data_Info_User(user_id)} 📶\n\n"
+            )
     
+        else:
+            await bot.send_message(message.chat.id, f"Ваш Баланс: {await info_user(user_id, 1)}р 💸")
     else:
-        await bot.send_message(message.chat.id, f"Ваш Баланс: {await info_user(user_id, 1)}р 💸")
+        await bot.send_message(message.chat.id, "Вас нету в системе :(\nЗарегистрируйтесь нажав /start")
+        
 
 
     """

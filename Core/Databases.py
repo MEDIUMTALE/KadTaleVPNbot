@@ -19,11 +19,12 @@ async def add_user(user_id):
             print("User Есть в бд")
             return
         else:
+
             # Добавляем нового пользователя
             await cursor.execute('''
                 INSERT OR IGNORE INTO users (user_id, balance)
                 VALUES (?, ?)
-            ''', (user_id, 15))
+            ''', (user_id, await info_settings(5)))
             
             await cursor.execute('''
                 INSERT OR IGNORE INTO logs (type, text, date)
@@ -44,7 +45,18 @@ async def info_user(user_id, cal):
         if results:  # Если пользователь найден
             return results[0][cal]  # Возвращаем запрошенное поле
         return None  # Или можно вызвать исключение, если пользователь не найден
-    
+
+async def existence_user(user_id):
+    async with aiosqlite.connect('vpn_bot.db') as conn:
+        cursor = await conn.cursor()
+        await cursor.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
+        results = await cursor.fetchall()
+        
+        if results:
+            return True
+        else:
+            return False
+
 async def info_settings(cal):
     async with aiosqlite.connect('vpn_bot.db') as conn:
         cursor = await conn.cursor()
@@ -78,3 +90,4 @@ async def user_chage_Balance(user_id, value):
         await conn.commit()
 
 #asyncio.run(user_chage_Balance(1324016724, 1))
+#print(asyncio.run(existence_user(1324016724)))

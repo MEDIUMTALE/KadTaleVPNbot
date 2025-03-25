@@ -124,3 +124,4 @@ async def mGet_Data_Info_User(user_id):
 #asyncio.run(mAddUser("1324016724"))
 #asyncio.run(mDelUser("1324016724"))
 #print(asyncio.run(mGetKayUser("1324016724")))
+#print(asyncio.run(mGet_Data_Info_User("1324016724")))
