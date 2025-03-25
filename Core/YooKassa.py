@@ -7,7 +7,7 @@ payment_status = {}
 
 async def send_invoice_to_user(message, bot, amount_rub):
     provider_token = '390540012:LIVE:67574'  # Замените на реальный!
-    prices = [LabeledPrice(label="Пополнение баланса", amount=int(amount_rub * 100))]
+    prices = [LabeledPrice(label="Пополнение баланса", amount=int(amount_rub))]
 
     try:
         await bot.send_invoice(
