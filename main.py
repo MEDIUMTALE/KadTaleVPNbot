@@ -37,7 +37,7 @@ async def check_payment_callback(call: types.CallbackQuery):
 
         amout = payment.amount.value
         
-        metadata = getattr(payment, 'metadata', None)  # Безопасное получение metadata
+        #metadata = getattr(payment, 'metadata', None)  # Безопасное получение metadata
 
         user_id = payment.metadata.get('user_id')
 
@@ -50,6 +50,12 @@ async def check_payment_callback(call: types.CallbackQuery):
         print(user_id)
 
         if status == "succeeded":
+            # Удаляем исходное сообщение
+            await bot.delete_message(
+                chat_id=call.message.chat.id,
+                message_id=call.message.message_id
+            )
+
             await bot.send_message(
                 chat_id,
                 "✅ Платеж успешно завершен! Баланс пополнен."
@@ -57,7 +63,7 @@ async def check_payment_callback(call: types.CallbackQuery):
 
 
             balance = await info_user(user_id, 1) + int(amout)
-            print(balance)
+
             await user_chage_Balance(user_id, balance)
             
         elif status == "pending":
