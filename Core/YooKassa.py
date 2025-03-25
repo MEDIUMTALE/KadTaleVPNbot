@@ -26,7 +26,7 @@ async def send_payment_sbp(message: types.Message, bot: AsyncTeleBot, amount: fl
             "payment_method_data": {"type": "bank_card"},
             "confirmation": {
                 "type": "redirect",
-                "return_url": "https://t.me/"
+                "return_url": "https://t.me/KadTaleVPN_bot"
             },
             "capture": True,
             "description": "Пополнение баланса",
