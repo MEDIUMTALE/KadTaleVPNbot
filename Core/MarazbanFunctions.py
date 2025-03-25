@@ -99,5 +99,6 @@ async def mChangeStatusUser(user_id):
         print(f"Ошибка при добавлении пользователя: {e}")
 
 
-#asyncio.run(mAddUser(1324016724))
+#asyncio.run(mAddUser("1324016724"))
 #asyncio.run(mDelUser("1324016724"))
+#print(asyncio.run(mGetKayUser("1324016724")))
