@@ -66,6 +66,8 @@ async def check_payment_callback(call: types.CallbackQuery):
 
             await user_chage_Balance(user_id, balance)
 
+            if await mGetKayUser(user_id) == "Вы не подключенны к тарифу😟":
+                await mAddUser(user_id)
             
         elif status == "pending":
             await bot.send_message(

@@ -35,25 +35,26 @@ async def pay_summa_balance(message, bot):
     user_id = message.from_user.id
 
     if len(textAr) < 0:
-        await bot.send_message(user_id, "❌ Ошибка: команда должна содержать сумму. Пример: /pay 60")
+        await bot.send_message(user_id, f"❌ Ошибка: команда должна содержать сумму. Пример: /pay {await info_settings(2)}")
         return
     
         
     money = int(textAr[1]) * 100
 
-    if int(textAr[1])<1:
-        await bot.send_message(user_id, "❌ Ошибка: минимальная сумма пополнения 60р. Пример: /pay 60")
+    if int(textAr[1])<3:
+        await bot.send_message(user_id, f"❌ Ошибка: минимальная сумма пополнения {await info_settings(2)}. Пример: /pay {await info_settings(2)}")
         return
     
-    print(f"mony :::: {money}")
-    if await info_user(user_id, 0):  # Если пользователь уже существует
-        await send_payment_sbp(message, bot, int(textAr[1]))
-        #await send_invoice_to_user(message, bot, money)
-        return
     else:
-        print("Pay Usera нет в бд")
-        await bot.send_message(message.chat.id, "Вас нету в системе :(\nЗарегистрируйтесь нажав /start")
-        return
+        print(f"mony :::: {money}")
+        if await info_user(user_id, 0):  # Если пользователь уже существует
+            await send_payment_sbp(message, bot, int(textAr[1]))
+            #await send_invoice_to_user(message, bot, money)
+            return
+        else:
+            print("Pay Usera нет в бд")
+            await bot.send_message(message.chat.id, "Вас нету в системе :(\nЗарегистрируйтесь нажав /start")
+            return
 
 
 async def help_command(message, bot):
