@@ -28,13 +28,23 @@ async def info_vpn_command(message, bot):
 
 async def buy_subscription_command(message, bot):
     #await bot.send_message(message.chat.id, text["buy_subscription_command_text"], reply_markup=purchase_a_subscription())
-    await bot.send_message(message.chat.id, "Для пополнения щёта используйте комманду /buy 'Сумма пополнения'")
+    await bot.send_message(message.chat.id, "Для пополнения щёта используйте комманду /pay 'Сумма пополнения'")
 
-async def buy_summa_balance(message, bot):
+async def pay_summa_balance(message, bot):
     textAr = message.text.split()
     user_id = message.from_user.id
 
+    if len(textAr) < 2:
+        await bot.send_message(user_id, "❌ Ошибка: команда должна содержать сумму. Пример: /pay 60")
+        return
+    
+        
     money = int(textAr[1]) * 100
+
+    if int(textAr[1])<60:
+        await bot.send_message(user_id, "❌ Ошибка: минимальная сумма пополнения 60р. Пример: /pay 60")
+        return
+    
     print(f"mony :::: {money}")
     if await info_user(user_id, 0):  # Если пользователь уже существует
         await send_invoice_to_user(message, bot, money)
@@ -42,6 +52,7 @@ async def buy_summa_balance(message, bot):
     else:
         print("Pay Usera нет в бд")
         await bot.send_message(message.chat.id, "Вас нету в системе :(\nЗарегистрируйтесь нажав /start")
+        return
 
 
 async def help_command(message, bot):
@@ -142,7 +153,7 @@ async def info_tariff(message, bot):
 # Словарь команд (теперь хранит асинхронные функции)
 COMMANDS = {
     "/start": start_command,
-    "/buy": buy_summa_balance,
+    "/pay": pay_summa_balance,
     "Информация о VPN 📜": info_vpn_command,
     "Получить Ключ 🔑": vpn_key,
     "Пополнить баланс 💰️": buy_subscription_command,
