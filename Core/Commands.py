@@ -1,7 +1,7 @@
 import aiosqlite
 from telebot.async_telebot import AsyncTeleBot
 from Core.keyboards import *
-from Core.Databases import *
+from Core.Databases import info_settings, info_user, add_user
 from Core.text import text
 from Core.MarazbanFunctions import mGetKayUser  # Добавьте этот импорт
 
@@ -33,13 +33,17 @@ async def invite_friend(message, bot):
 async def vpn_key(message, bot):
     if await info_user(message.from_user.id, 1) != 0:
         kay = await mGetKayUser(message.from_user.id)
-        await bot.send_message(message.chat.id, f"{message.from_user.id}     {kay}")
+        await bot.send_message(message.chat.id, f"Ваш ключ🔑\n{kay}")
     else:
         await bot.send_message(message.chat.id, "Вы не подключены")
 
 async def user_balance(message, bot):
     user_id = message.from_user.id
     print(user_id)
+
+    await bot.send_message(message.chat.id, f"Ваш Баланс: {await info_user(user_id, 1)}р 💸")
+
+    """
     async with aiosqlite.connect('vpn_bot.db') as connection:
         cursor = await connection.cursor()
         await cursor.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
@@ -48,6 +52,7 @@ async def user_balance(message, bot):
         for row in results:
             await bot.send_message(message.chat.id, f"Ваш Баланс: {row[1]}р 💸")
             print(row[2])
+    """
 
 # Словарь команд (теперь хранит асинхронные функции)
 COMMANDS = {

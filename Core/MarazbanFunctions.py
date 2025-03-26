@@ -57,8 +57,8 @@ async def mDelUser(user_id):
         print(f"Ошибка при добавлении пользователя: {e}")
 
 async def mGetKayUser(user_id):
-        from Core.Databases import info_Settings
-
+    from Core.Databases import info_settings
+    try:
         # Получаем токен
         token = await get_token()
         if not hasattr(token, "access_token"):
@@ -67,10 +67,10 @@ async def mGetKayUser(user_id):
 
         user_info = await api.get_user(username=f"{user_id}", token=token.access_token)
 
-        return f"{await info_Settings(3)}{user_info.subscription_url}"
-        
+        return f"{await info_settings(3)}{user_info.subscription_url}"
+    except:    
         print("Пользователя не существует")
-        return "Пользователя не существует"
+        return "Вы не подключенны к тарифу"
 
 
 async def mChangeStatusUser(user_id):

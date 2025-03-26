@@ -44,7 +44,7 @@ async def info_user(user_id, cal):
             return results[0][cal]  # Возвращаем запрошенное поле
         return None  # Или можно вызвать исключение, если пользователь не найден
     
-async def info_Settings(cal):
+async def info_settings(cal):
     async with aiosqlite.connect('vpn_bot.db') as conn:
         cursor = await conn.cursor()
         await cursor.execute("SELECT * FROM settings WHERE id = ?", (0,))
