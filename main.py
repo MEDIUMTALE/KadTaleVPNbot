@@ -1,110 +1,96 @@
-import telebot
-from Core.Commands import CommandProcessing  # Правильный импорт функции
-import sqlite3
-from datetime import datetime
 import asyncio
-import threading
+from datetime import datetime
+import aiosqlite  # Асинхронная замена для sqlite3
+from telebot.async_telebot import AsyncTeleBot  # Асинхронная версия telebot
 
+from Core.Commands import CommandProcessing
 from Core.Databases import *
 from Core.MarazbanFunctions import *
 
-# вызов функции для инициализации базы данных и создания таблиц
-#init_db()
-
 token = "7622209066:AAFoZZanqTXQZdK8fwXHqngmcOUAiUHZxpc"
-bot = telebot.TeleBot(token)
+bot = AsyncTeleBot(token)
 
-# Обработчик нажатий на все кнопки
+# Обработчик сообщений
 @bot.message_handler(func=lambda message: True)
-def handle_buttons(message):
-    CommandProcessing(message, bot)  # передаем message
+async def handle_buttons(message):
+    await CommandProcessing(message, bot)
 
+# Обработчик callback-запросов
 @bot.callback_query_handler(func=lambda callback: True)
-def callback_message(callback):
-    CommandProcessing(callback=callback, bot=bot)  # передаем callback
+async def callback_message(callback):
+    await CommandProcessing(callback=callback, bot=bot)
 
 async def fetch_data():
-    connection = sqlite3.connect('vpn_bot.db')
-    cursor = connection.cursor()
-    cursor.execute("SELECT date FROM settings WHERE id = ?", (0,))
-    results = cursor.fetchall()
-    connection.close()
-    # Проверяем, есть ли результаты
-    if results:  # Если список не пуст
-        for row in results:
-            now = datetime.now()
-            day = now.day
-            mon = now.month
-            year = now.year
-            h = now.hour
-            m = now.minute
+    async with aiosqlite.connect('vpn_bot.db') as connection:
+        cursor = await connection.cursor()
+        await cursor.execute("SELECT date FROM settings WHERE id = ?", (0,))
+        results = await cursor.fetchall()
+        
+        if results:
+            for row in results:
+                now = datetime.now()
+                day = now.day
+                mon = now.month
+                year = now.year
+                h = now.hour
+                m = now.minute
 
-            if row[0] != day:
-                connection = sqlite3.connect('vpn_bot.db')
-                cursor = connection.cursor()
-                cursor.execute("UPDATE settings SET date = ? WHERE id = 0", (day,))
-                connection.commit()
-                connection.close()
-                print("День изменён")
+                if row[0] != day:
+                    await cursor.execute("UPDATE settings SET date = ? WHERE id = 0", (day,))
+                    await connection.commit()
+                    print("День изменён")
 
-                
-                connection = sqlite3.connect('vpn_bot.db')
-                cursor = connection.cursor()
-                cursor.execute("SELECT * FROM users WHERE user_id IS NOT NULL")
-                results = cursor.fetchall()
-                connection.close()
-                
-                if results:  # Если список не пуст
-                    for row in results:
-                        print(row[1])
+                    await cursor.execute("SELECT * FROM users WHERE user_id IS NOT NULL")
+                    user_results = await cursor.fetchall()
+                    
+                    if user_results:
+                        for user_row in user_results:
+                            print(user_row[1])
 
-                        balance = row[1] - 3
+                            print(await info_settings(2))
 
-                        if balance<=0:
-                            balance=0
+                            tariffDay = await info_settings(2)
 
-                        connection = sqlite3.connect('vpn_bot.db')
-                        cursor = connection.cursor()
-                        
-                        cursor.execute('''
-                            INSERT OR IGNORE INTO logs (type, text, date)
-                            VALUES (?, ?, ?)
-                        ''', ("NewDayMinusMoney", f"user_id: {row[0]}, Money {row[1]} - 3 = {balance}", f"{day}.{mon}.{year}-{h}:{m}"))
-                        connection.commit()
-                        cursor.execute("UPDATE users SET balance = ? WHERE user_id = ?", (balance ,row[0]))
-                        connection.commit()
+                            balance = user_row[1] - tariffDay
+                            balance = max(balance, 0)  # Заменяем if balance<=0: balance=0
 
-                        if(info_user(row[0], 1)==0):
-                            await mDelUser(row[0])
-                            print(f"User id Dell{row[0]}")
+                            await cursor.execute('''
+                                INSERT OR IGNORE INTO logs (type, text, date)
+                                VALUES (?, ?, ?)
+                            ''', ("NewDayMinusMoney", f"user_id: {user_row[0]}, Money {user_row[1]} - {tariffDay} = {balance}", f"{day}.{mon}.{year}-{h}:{m}"))
+                            await connection.commit()
+                            
+                            await cursor.execute("UPDATE users SET balance = ? WHERE user_id = ?", (balance, user_row[0]))
+                            await connection.commit()
 
-                        connection.close()
+                            if await info_user(user_row[0], 1) == 0:
+                                #await mDelUser(user_row[0])
+                                print(f"User id Dell {user_row[0]}")
 
-            else:
-                print("День Софподает")
-                
-    else:
-        print("Нет данных для id = 0")
-
+                else:
+                    print("День совпадает")
+        else:
+            print("Нет данных для id = 0")
 
 async def run_periodically():
     while True:
-        await fetch_data()  # Выполняем действие
-        await asyncio.sleep(60)  # Ждём 60 секунд
+        await fetch_data()
+        await asyncio.sleep(60)
 
+async def run_bot():
+    await bot.polling(none_stop=True)
 
-def run_bot():
-    bot.polling(none_stop=True)
-
-
-# Основная асинхронная функция
 async def main():
-    # Запускаем бота в отдельном потоке
-    bot_thread = threading.Thread(target=run_bot)
-    bot_thread.start()
+    # Создаем задачи для одновременного выполнения
+    bot_task = asyncio.create_task(run_bot())
+    periodic_task = asyncio.create_task(run_periodically())
     
-    # Запускаем периодическую задачу
-    await run_periodically()  # Используем await для вызова корутины
+    # Ожидаем завершения обеих задач (хотя они бесконечные)
+    await asyncio.gather(bot_task, periodic_task)
 
 if __name__ == "__main__":
-    asyncio.run(main())  # Запускаем асинхронный цикл
+    # Инициализация базы данных (если нужно)
+    # await init_db()  # Убедитесь, что init_db тоже асинхронная
+    
+    # Запускаем асинхронное приложение
+    asyncio.run(main())

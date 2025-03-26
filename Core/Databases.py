@@ -1,54 +1,54 @@
-import sqlite3
+import aiosqlite
 from datetime import datetime
-import threading
-import asyncio
-
 from Core.MarazbanFunctions import *
 
-now = datetime.now()
-day = now.day
-mon = now.month
-year = now.year
-h = now.hour
-m = now.minute
+async def add_user(user_id):
+    now = datetime.now()
+    date_str = f"{now.day}.{now.month}.{now.year}-{now.hour}:{now.minute}"
+    
+    async with aiosqlite.connect('vpn_bot.db') as conn:
+        cursor = await conn.cursor()
+        
+        # Проверяем существование пользователя
+        await cursor.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
+        results = await cursor.fetchall()
+        
+        if results:  # Если пользователь уже существует
+            print("User Есть в бд")
+            return
+        else:
+            # Добавляем нового пользователя
+            await cursor.execute('''
+                INSERT OR IGNORE INTO users (user_id, balance)
+                VALUES (?, ?, ?)
+            ''', (user_id, 15))
+            
+            await cursor.execute('''
+                INSERT OR IGNORE INTO logs (type, text, date)
+                VALUES (?, ?, ?)
+            ''', ("Registration", f"user_id: {user_id}, user_id: '{user_id}' зарегистрировался", date_str))
+            
+            await conn.commit()
+            
+            # Асинхронный вызов функции добавления пользователя
+            await mAddUser(user_id)
 
-def add_user(user_id):
-    conn = sqlite3.connect('vpn_bot.db')
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
-    results = cursor.fetchall()
-    conn.close()
-    # Проверяем, есть ли результаты
-    if results:  # Если список не пуст
-        print("User Есть в бд")
-        return
-    else:
-        conn = sqlite3.connect('vpn_bot.db')
-        cursor = conn.cursor()
-
-        # Вставляем пользователя, если его еще нет
-        cursor.execute('''
-            INSERT OR IGNORE INTO users (user_id, balance, key)
-            VALUES (?, ?, ?)
-        ''', (user_id, 15, 0))
-        conn.commit()
-        cursor.execute('''
-            INSERT OR IGNORE INTO logs (type, text, date)
-            VALUES (?, ?, ?)
-        ''', ("Registration", f"user_id: {user_id}, user_id: '{user_id}' зарегистрировался", f"{day}.{mon}.{year}-{h}:{m}"))
-        conn.commit()
-
-        asyncio.run(mAddUser(user_id))
-
-    conn.close()
-
-def info_user(user_id, cal):
-    connection = sqlite3.connect('vpn_bot.db')
-    cursor = connection.cursor()
-    cursor.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
-    results = cursor.fetchall()
-    connection.close()
-    # Проверяем, есть ли результаты
-    if results:  # Если список не пуст
-        for row in results:
-            return row[cal]
+async def info_user(user_id, cal):
+    async with aiosqlite.connect('vpn_bot.db') as conn:
+        cursor = await conn.cursor()
+        await cursor.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
+        results = await cursor.fetchall()
+        
+        if results:  # Если пользователь найден
+            return results[0][cal]  # Возвращаем запрошенное поле
+        return None  # Или можно вызвать исключение, если пользователь не найден
+    
+async def info_settings(cal):
+    async with aiosqlite.connect('vpn_bot.db') as conn:
+        cursor = await conn.cursor()
+        await cursor.execute("SELECT * FROM settings WHERE id = ?", (0,))
+        results = await cursor.fetchall()
+        
+        if results:  # Если пользователь найден
+            return results[0][cal]  # Возвращаем запрошенное поле
+        return None  # Или можно вызвать исключение, если пользователь не найден

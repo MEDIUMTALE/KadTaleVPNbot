@@ -66,14 +66,15 @@ async def mGetInfoStatusUser(user_id):
             return
 
         user_info = await api.get_user(username=f"{user_id}", token=token.access_token)
-        #print("Информация о пользователе:", user_info)
-        print(user_info)
-    except Exception as e:
-        print(f"Ошибка при добавлении пользователя: {e}")
 
+        return user_info.subscription_url
+        
+    except Exception as e:
+        print("Пользователя не существует")
+        return "Пользователя не существует"
 
 
 
 #asyncio.run(mGetInfoStatusUser(1324016724))
 #asyncio.run(mAddUser(42))
-#asyncio.run(mDelUser("roma"))
+#asyncio.run(mDelUser("1324016724"))
