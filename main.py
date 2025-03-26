@@ -51,20 +51,8 @@ async def fetch_data():
 
                             tariffDay = await info_settings(2)
 
-<<<<<<< HEAD
                             balance = user_row[1] - tariffDay
                             balance = max(balance, 0)  # Заменяем if balance<=0: balance=0
-=======
-                        connection = sqlite3.connect('vpn_bot.db')
-                        cursor = connection.cursor()
-                        cursor.execute('''
-                            INSERT OR IGNORE INTO logs (type, text, date)
-                            VALUES (?, ?, ?)
-                        ''', ("NewDayMinusMoney", f"user_id: {row[0]}, Money {row[1]} - 3 = {balance}", f"{day}.{mon}.{year}-{h}:{m}"))
-                        connection.commit()
-                        cursor.execute("UPDATE users SET balance = ? WHERE user_id = ?", (balance ,row[0]))
-                        connection.commit()
->>>>>>> parent of 9b12d4e (fix)
 
                             await cursor.execute('''
                                 INSERT OR IGNORE INTO logs (type, text, date)

@@ -3,24 +3,17 @@ from telebot.async_telebot import AsyncTeleBot
 from Core.keyboards import *
 from Core.Databases import *
 from Core.text import text
-from Core.MarazbanFunctions import *
+from Core.MarazbanFunctions import mGetKayUser  # Добавьте этот импорт
 
 from telebot import types as async_types
 
 # Асинхронные функции обработки команд
+
 async def start_command(message, bot):
-    try:
-        user_id = message.from_user.id
-        await add_user(user_id)
-        markup = await keyboard_start()
-        await bot.send_message(
-            message.chat.id, 
-            "Вы зарегистрированы!\nПривет! Выбери один из вариантов ниже:",
-            reply_markup=markup
-        )
-    except Exception as e:
-        print(f"Ошибка при создании клавиатуры: {e}")
-        await bot.send_message(message.chat.id, "Произошла ошибка, попробуйте позже")
+    user_id = message.from_user.id
+    await add_user(user_id)
+    await bot.send_message(message.chat.id, "Вы зарегистрированы!", reply_markup=keyboard_start())
+    await bot.send_message(message.chat.id, "Привет! Выбери один из вариантов ниже:", reply_markup=keyboard_start())
 
 async def info_vpn_command(message, bot):
     await bot.send_message(message.chat.id, text["info_vpn_command_text"])
@@ -39,7 +32,7 @@ async def invite_friend(message, bot):
 
 async def vpn_key(message, bot):
     if await info_user(message.from_user.id, 1) != 0:
-        kay = await mGetInfoStatusUser(message.from_user.id)
+        kay = await mGetKayUser(message.from_user.id)
         await bot.send_message(message.chat.id, f"{message.from_user.id}     {kay}")
     else:
         await bot.send_message(message.chat.id, "Вы не подключены")
