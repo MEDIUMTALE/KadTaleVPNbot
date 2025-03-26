@@ -159,7 +159,7 @@ async def fetch_data():
 
                             if days_left == 1:
                                 print(f"Message To Id{user_row[0]}")
-                                await bot.send_message(user_row[0], f"❗❗ У вас осталось {days_left:.0f} дней ❗❗\n\n🚨 Не забудьте продлить тариф 🚨")
+                                await bot.send_message(user_row[0], f"❗❗ У вас осталось {days_left:.0f} день ❗❗\n\n🚨 Не забудьте продлить тариф 🚨")
                             elif days_left==0:
                                 print(f"ЫMessage To Id{user_row[0]}")
                                 await bot.send_message(user_row[0], f"❗❗ У вас осталось закончился тариф ❗❗\n\n🚨 Продлейте тариф 🚨")
