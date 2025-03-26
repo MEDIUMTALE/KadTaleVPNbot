@@ -100,4 +100,4 @@ async def mChangeStatusUser(user_id):
 
 
 #asyncio.run(mAddUser(1324016724))
-asyncio.run(mDelUser("1324016724"))
+#asyncio.run(mDelUser("1324016724"))
