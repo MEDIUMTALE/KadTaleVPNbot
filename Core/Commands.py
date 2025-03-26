@@ -33,9 +33,9 @@ async def invite_friend(message, bot):
 async def vpn_key(message, bot):
     if await info_user(message.from_user.id, 1) != 0:
         kay = await mGetKayUser(message.from_user.id)
-        await bot.send_message(message.chat.id, f"Ваш ключ🔑\n{kay}")
+        await bot.send_message(message.chat.id, f"{kay}")
     else:
-        await bot.send_message(message.chat.id, "Вы не подключены")
+        await bot.send_message(message.chat.id, "Вы не подключенны к тарифу😟")
 
 async def user_balance(message, bot):
     user_id = message.from_user.id

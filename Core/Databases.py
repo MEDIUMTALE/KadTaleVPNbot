@@ -53,3 +53,17 @@ async def info_settings(cal):
         if results:  # Если пользователь найден
             return results[0][cal]  # Возвращаем запрошенное поле
         return None  # Или можно вызвать исключение, если пользователь не найден
+    
+async def add_logs(type, text):
+    now = datetime.now()
+    date_str = f"{now.day}.{now.month}.{now.year}-{now.hour}:{now.minute}"
+
+    async with aiosqlite.connect('vpn_bot.db') as conn:
+        cursor = await conn.cursor()
+
+        await cursor.execute('''
+                INSERT OR IGNORE INTO logs (type, text, date)
+                VALUES (?, ?, ?)
+            ''', (f"{type}", f"{text}", date_str))
+            
+        await conn.commit()

@@ -1,5 +1,8 @@
 import asyncio
 from marzban import MarzbanAPI, UserCreate, ProxySettings
+from Core.Databases import add_logs, info_settings, info_user
+
+
 # Инициализация API
 api = MarzbanAPI(base_url="https://fin-01.kadtale.site")
 
@@ -34,6 +37,7 @@ async def mAddUser(user_id):
         # Добавляем пользователя
         added_user = await api.add_user(user=new_user, token=token.access_token)
         print("Добавленный пользователь:", added_user)
+        await add_logs("Marzban_Registration", f"user_id: {user_id}, добавлен в Marzban, Balance: {await info_user(user_id, 1)}")
     except Exception as e:
         print(f"Ошибка при добавлении пользователя: {e}")
 
@@ -53,11 +57,12 @@ async def mDelUser(user_id):
         # Добавляем пользователя
         await api.remove_user(username=f"{user_id}", token=token.access_token)
         print("Пользователь удалён.")
+        await add_logs("Marzban_Delete", f"user_id: {user_id}, удалён из Marzban, Balance: {await info_user(user_id, 1)}")
+
     except Exception as e:
         print(f"Ошибка при добавлении пользователя: {e}")
 
 async def mGetKayUser(user_id):
-    from Core.Databases import info_settings
     try:
         # Получаем токен
         token = await get_token()
@@ -67,10 +72,10 @@ async def mGetKayUser(user_id):
 
         user_info = await api.get_user(username=f"{user_id}", token=token.access_token)
 
-        return f"{await info_settings(3)}{user_info.subscription_url}"
+        return f"Ваш ключ🔑\n{await info_settings(3)}{user_info.subscription_url}"
     except:    
         print("Пользователя не существует")
-        return "Вы не подключенны к тарифу"
+        return "Вы не подключенны к тарифу😟"
 
 
 async def mChangeStatusUser(user_id):
@@ -94,5 +99,5 @@ async def mChangeStatusUser(user_id):
         print(f"Ошибка при добавлении пользователя: {e}")
 
 
-#asyncio.run(mAddUser(42))
-#asyncio.run(mDelUser("1324016724"))
+#asyncio.run(mAddUser(1324016724))
+asyncio.run(mDelUser("1324016724"))
