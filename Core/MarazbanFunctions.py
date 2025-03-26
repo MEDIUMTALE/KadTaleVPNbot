@@ -67,6 +67,7 @@ async def mGetInfoStatusUser(user_id):
 
         user_info = await api.get_user(username=f"{user_id}", token=token.access_token)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         print("Информация о пользователе:", user_info)
     except Exception as e:
@@ -100,5 +101,33 @@ async def mChangeStatusUser(user_id):
     except Exception as e:
         print(f"Ошибка при добавлении пользователя: {e}")
 
+=======
+        print("Информация о пользователе:", user_info)
+    except Exception as e:
+        print(f"Ошибка при добавлении пользователя: {e}")
+
+
+
+async def mChangeStatusUser(user_id):
+    try:
+        # Получаем токен
+        token = await get_token()
+        if not hasattr(token, "access_token"):
+            print("Ошибка: токен не содержит access_token")
+            return
+
+        # Создаем нового пользователя
+        new_user = UserCreate(
+            username=f"{user_id}",
+            proxies={"vless": ProxySettings(flow="xtls-rprx-vision")}
+        )
+
+        # Добавляем пользователя
+        added_user = await api.add_user(user=new_user, token=token.access_token)
+        print("Добавленный пользователь:", added_user)
+    except Exception as e:
+        print(f"Ошибка при добавлении пользователя: {e}")
+
+>>>>>>> parent of 9b12d4e (fix)
 #asyncio.run(mAddUser(42))
 #asyncio.run(mDelUser("1324016724"))
