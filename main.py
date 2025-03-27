@@ -13,7 +13,7 @@ from Core.MarazbanFunctions import *
 from Core.YooKassa import check_payment_status
 from yookassa import Payment
 
-token = "7622209066:AAFoZZanqTXQZdK8fwXHqngmcOUAiUHZxpc"
+token = "7662636396:AAGcWhdrmXkbYFKWkOWYCweQ5WDgsI622W4"
 #token = "6120629335:AAF8ERXPC7rCzWccZbKwi1WxODAzqBPObx8"
 bot = AsyncTeleBot(token)
 
