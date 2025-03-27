@@ -279,11 +279,11 @@ async def CommandProcessing(message=None, bot=None, callback=None):
             if(command_function):
                 await command_function(message, bot)
             else:
-                await bot.send_message(message.chat.id, "В разработке...", reply_markup=await keyboard_start(message.from_user.id))
+                await bot.send_message(message.chat.id, "Я не знаю такой комманды😟", reply_markup=await keyboard_start(message.from_user.id))
 
     elif callback and callback.message:
         callback_function = CALLBACKS.get(callback.data)
         if callback_function:
             await callback_function(callback, bot)
         else:
-            await bot.send_message(callback.message.chat.id, "В разработке...", reply_markup=await keyboard_start(message.from_user.id))
+            await bot.send_message(callback.message.chat.id, "Я не знаю такой комманды😟", reply_markup=await keyboard_start(message.from_user.id))

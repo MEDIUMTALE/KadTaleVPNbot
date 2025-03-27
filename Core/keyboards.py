@@ -95,7 +95,7 @@ def purchase_a_subscription():
 def help_menu():
     markup = types.InlineKeyboardMarkup()
 
-    target_username = "kadtalevpn_support"
+    target_username = "rozkomvpn_support"
     profile_url = f"https://t.me/{target_username}"
 
     row1 = types.InlineKeyboardButton("📝 Часто задаваемые вопросы", callback_data="frequent_questions")
@@ -111,7 +111,7 @@ def help_menu():
 # часто задаваемые вопрсосы
 def frequent_questions():
     markup = types.InlineKeyboardMarkup()
-    target_username = "kadtalevpn_support"
+    target_username = "rozkomvpn_support"
     profile_url = f"https://t.me/{target_username}"
 
     row1 = types.InlineKeyboardButton("💸 Проблема с платежом", callback_data="payment_problems")
@@ -132,7 +132,7 @@ def frequent_questions():
 def back_to_faq_keyboard():
     markup = types.InlineKeyboardMarkup()
 
-    target_username = "kadtalevpn_support"
+    target_username = "rozkomvpn_support"
     profile_url = f"https://t.me/{target_username}"
 
     row1 = types.InlineKeyboardButton("⏪ Назад", callback_data="faq_back")
