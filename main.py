@@ -13,6 +13,8 @@ from Core.MarazbanFunctions import *
 from Core.YooKassa import check_payment_status
 from yookassa import Payment
 
+from Core.checks import check_add
+
 token = "7662636396:AAGcWhdrmXkbYFKWkOWYCweQ5WDgsI622W4"
 #token = "6120629335:AAF8ERXPC7rCzWccZbKwi1WxODAzqBPObx8"
 bot = AsyncTeleBot(token)
@@ -55,12 +57,13 @@ async def check_payment_callback(call: types.CallbackQuery):
                 chat_id=call.message.chat.id,
                 message_id=call.message.message_id
             )
+            
+            await check_add(payment.id, amout, user_id, payment.created_at, status)
 
             await bot.send_message(
                 chat_id,
                 "✅ Платеж успешно завершен! Баланс пополнен."
             )
-
 
             balance = await info_user(user_id, 1) + int(amout)
 
@@ -69,17 +72,23 @@ async def check_payment_callback(call: types.CallbackQuery):
             if await mGetKayUser(user_id) == "Вы не подключенны к тарифу😟":
                 await mAddUser(user_id)
             
+            
         elif status == "pending":
             await bot.send_message(
                 chat_id,
                 "⌛ Платеж еще обрабатывается. Попробуйте позже."
             )
+
+
         else:
+            await check_add(payment.id, amout, user_id, payment.created_at, status)
+
             await bot.send_message(
                 chat_id,
                 "❌ Платеж не был завершен или произошла ошибка."
             )
-
+        print(f"chat_id: {chat_id}\namout: {amout}\nuser_id: {user_id}\npayment.created_at: {payment.created_at}")
+    
     except Exception as e:
         print(f"Ошибка в обработчике callback: {e}")
         try:

