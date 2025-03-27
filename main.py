@@ -67,8 +67,10 @@ async def check_payment_callback(call: types.CallbackQuery):
 
             balance = await info_user(user_id, 1) + int(amout)
 
-            await user_chage_Balance(user_id, balance)
+            await add_logs("Pay_Balance", f"user_id: {user_id}, amount: {int(amout)}р, payment.id: {payment.id}")
 
+            await user_chage_Balance(user_id, balance)
+            
             if await mGetKayUser(user_id) == "Вы не подключенны к тарифу😟":
                 await mAddUser(user_id)
             
