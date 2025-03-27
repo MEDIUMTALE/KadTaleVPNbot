@@ -23,9 +23,10 @@ async def send_payment_sbp(message: types.Message, bot: AsyncTeleBot, amount: fl
                 "value": f"{amount:.2f}",
                 "currency": "RUB"
             },
+            "payment_method_data": {"type": "bank_card"},
             "confirmation": {
                 "type": "redirect",
-                "return_url": "https://t.me/rozkomvpn_bot"
+                "return_url": "https://t.me/KadTaleVPN_bot"
             },
             "capture": True,
             "description": "Пополнение баланса",
