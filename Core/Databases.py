@@ -36,6 +36,13 @@ async def add_user(user_id):
             # Асинхронный вызов функции добавления пользователя
             await mAddUser(user_id)
 
+async def Chage_User_function_status(user_id, value):
+    async with aiosqlite.connect('vpn_bot.db') as conn:
+        cursor = await conn.cursor()
+        #await cursor.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
+        await cursor.execute("UPDATE users SET functin_status = ? WHERE user_id = ?", (value, user_id))
+        await conn.commit()
+
 async def info_user(user_id, cal):
     async with aiosqlite.connect('vpn_bot.db') as conn:
         cursor = await conn.cursor()
@@ -66,7 +73,7 @@ async def info_settings(cal):
         if results:  # Если пользователь найден
             return results[0][cal]  # Возвращаем запрошенное поле
         return None  # Или можно вызвать исключение, если пользователь не найден
-    
+
 async def add_logs(type, text):
     now = datetime.now()
     date_str = f"{now.day}.{now.month}.{now.year}-{now.hour}:{now.minute}"

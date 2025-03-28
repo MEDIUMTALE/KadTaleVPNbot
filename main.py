@@ -15,8 +15,8 @@ from yookassa import Payment
 
 from Core.checks import check_add
 
-token = "7662636396:AAGcWhdrmXkbYFKWkOWYCweQ5WDgsI622W4"
-#token = "6120629335:AAF8ERXPC7rCzWccZbKwi1WxODAzqBPObx8"
+#token = "7662636396:AAGcWhdrmXkbYFKWkOWYCweQ5WDgsI622W4"
+token = "6120629335:AAF8ERXPC7rCzWccZbKwi1WxODAzqBPObx8"
 bot = AsyncTeleBot(token)
 
 
@@ -60,9 +60,17 @@ async def check_payment_callback(call: types.CallbackQuery):
             
             await check_add(payment.id, amout, user_id, payment.created_at, status)
 
+            markup = types.InlineKeyboardMarkup()
+
+
+            row1 = types.InlineKeyboardButton("🛠 Инструкция по установке VPN", callback_data="installation_instructions")
+
+            markup.add(row1)
+
             await bot.send_message(
                 chat_id,
-                "✅ Платеж успешно завершен! Баланс пополнен."
+                "✅ Платеж успешно завершен! Баланс пополнен.",
+                reply_markup=markup
             )
 
             balance = await info_user(user_id, 1) + int(amout)
@@ -71,7 +79,7 @@ async def check_payment_callback(call: types.CallbackQuery):
 
             await user_chage_Balance(user_id, balance)
             
-            if await mGetKayUser(user_id) == "Вы не подключенны к тарифу😟":
+            if await mGetKayUser(user_id) == "Вы не подключенны к тарифу 😟":
                 await mAddUser(user_id)
             
             

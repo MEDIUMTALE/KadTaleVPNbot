@@ -8,11 +8,26 @@ from telebot.types import LabeledPrice, Message
 from telebot import types as async_types
 
 from Core.keyboards import *
-from Core.Databases import info_settings, info_user, add_user, existence_user, user_chage_Balance
+from Core.Databases import info_settings, info_user, add_user, existence_user, user_chage_Balance, Chage_User_function_status
 from Core.text import text
 from Core.MarazbanFunctions import mGetKayUser, get_token, api, mGet_Data_Info_User # Добавьте этот импорт
 
 from Core.YooKassa import send_payment_sbp
+
+# Комманды вызванные кнопками
+async def BtnCommands(message, bot, user_id):
+    function_status = await info_user(user_id, 3)
+    
+    if(message.text == "Назад 🔙"):
+        await back(message, bot)
+
+
+    elif("pay_balance"):
+
+        await Chage_User_function_status(user_id, None)
+        await pay_summa_balance(message, bot)
+
+
 
 
 # Асинхронные функции обработки команд
@@ -27,8 +42,13 @@ async def info_vpn_command(message, bot):
     await bot.send_message(message.chat.id, text["info_vpn_command_text"])
 
 async def buy_subscription_command(message, bot):
+    await Chage_User_function_status(message.from_user.id, "pay_balance")
     #await bot.send_message(message.chat.id, text["buy_subscription_command_text"], reply_markup=purchase_a_subscription())
-    await bot.send_message(message.chat.id, "Для пополнения щёта используйте комманду /pay 'Сумма пополнения'")
+
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)  # resize_keyboard=True аналогично C# ResizeKeyboard = true
+    row1 = types.KeyboardButton("Назад 🔙")
+    markup.add(row1)
+    await bot.send_message(message.chat.id, "Введите на сколько хотите пополнить балланс", reply_markup=markup)
 
 async def pay_summa_balance(message, bot):
     textAr = message.text.split()
@@ -45,16 +65,16 @@ async def pay_summa_balance(message, bot):
         return
     
         
-    money = int(textAr[1]) * 100
+    money = int(textAr[0]) * 100
 
-    if int(textAr[1])<3:
+    if int(textAr[0])<3:
         await bot.send_message(user_id, f"❌ Ошибка: минимальная сумма пополнения {await info_settings(2)}. Пример: /pay {await info_settings(2)}")
         return
     
     else:
         print(f"mony :::: {money}")
         if await info_user(user_id, 0):  # Если пользователь уже существует
-            await send_payment_sbp(message, bot, int(textAr[1]))
+            await send_payment_sbp(message, bot, int(textAr[0]))
             #await send_invoice_to_user(message, bot, money)
             return
         else:
@@ -75,9 +95,17 @@ async def invite_friend(message, bot):
 async def vpn_key(message, bot):
     if await info_user(message.from_user.id, 1) != 0:
         kay = await mGetKayUser(message.from_user.id)
-        await bot.send_message(message.chat.id, f"{kay}")
+
+        markup = types.InlineKeyboardMarkup()
+
+
+        row1 = types.InlineKeyboardButton("🛠 Инструкция по установке VPN", callback_data="installation_instructions")
+
+        markup.add(row1)
+        
+        await bot.send_message(message.chat.id, f"{kay}", reply_markup=markup)
     else:
-        await bot.send_message(message.chat.id, "Вы не подключенны к тарифу😟")
+        await bot.send_message(message.chat.id, "Вы не подключенны к тарифу 😟")
 
 async def user_balance(message, bot):
     user_id = message.from_user.id
@@ -160,8 +188,11 @@ async def info_tariff(message, bot):
     )
 """
 
-
-
+async def back(message, bot):
+    user_id = message.from_user.id
+    await Chage_User_function_status(user_id, None)
+    await bot.send_message(message.chat.id, "Выберете пункт", reply_markup=await keyboard_start(user_id))
+    
 
 # Словарь команд (теперь хранит асинхронные функции)
 COMMANDS = {
@@ -173,7 +204,8 @@ COMMANDS = {
     "Баланс 🏦": user_balance,
     "Помощь 🛟": help_command,
     "Назад ⏪": back_command,
-    "Партнерка 🤝": invite_friend
+    "Партнерка 🤝": invite_friend,
+    "Назад 🔙": back
 }
 
 # Асинхронные функции обработки callback кнопок
@@ -270,16 +302,20 @@ CALLBACKS = {
 # Основная асинхронная обработка команд и callback кнопок
 async def CommandProcessing(message=None, bot=None, callback=None):
     if message:
-        command_function = COMMANDS.get(message.text)
-        if command_function:
-            await command_function(message, bot)
+        user_id = message.from_user.id
+        if await info_user(user_id, 3) is not None:
+            await BtnCommands(message, bot, user_id)
         else:
-            text = message.text.split()
-            command_function = COMMANDS.get(text[0])
-            if(command_function):
+            command_function = COMMANDS.get(message.text)
+            if command_function:
                 await command_function(message, bot)
             else:
-                await bot.send_message(message.chat.id, "Я не знаю такой комманды😟", reply_markup=await keyboard_start(message.from_user.id))
+                text = message.text.split()
+                command_function = COMMANDS.get(text[0])
+                if(command_function):
+                    await command_function(message, bot)
+                else:
+                    await bot.send_message(message.chat.id, "Я не знаю такой комманды😟", reply_markup=await keyboard_start(message.from_user.id))
 
     elif callback and callback.message:
         callback_function = CALLBACKS.get(callback.data)
