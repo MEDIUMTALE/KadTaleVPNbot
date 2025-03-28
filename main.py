@@ -7,13 +7,13 @@ from telebot.types import LabeledPrice, Message
 from telebot import types
 
 from Core.Commands import CommandProcessing
+from Core.keyboards import keyboard_start
+
 from Core.Databases import *
 from Core.MarazbanFunctions import *
 
 from Core.YooKassa import check_payment_status
 from yookassa import Payment
-
-from Core.checks import check_add
 
 #token = "7662636396:AAGcWhdrmXkbYFKWkOWYCweQ5WDgsI622W4"
 token = "6120629335:AAF8ERXPC7rCzWccZbKwi1WxODAzqBPObx8"
@@ -60,7 +60,7 @@ async def check_payment_callback(call: types.CallbackQuery):
             
             await check_add(payment.id, amout, user_id, payment.created_at, status)
 
-            markup = types.InlineKeyboardMarkup()
+            markup = reply_markup= await keyboard_start(user_id)
 
 
             row1 = types.InlineKeyboardButton("🛠 Инструкция по установке VPN", callback_data="installation_instructions")
@@ -86,8 +86,10 @@ async def check_payment_callback(call: types.CallbackQuery):
         elif status == "pending":
             await bot.send_message(
                 chat_id,
-                "⌛ Платеж еще обрабатывается. Попробуйте позже."
+                "⌛ Платеж еще обрабатывается. Попробуйте позже.",
+                reply_markup= await keyboard_start(user_id)
             )
+            await check_add(payment.id, amout, user_id, payment.created_at, status)
 
 
         else:
@@ -95,7 +97,8 @@ async def check_payment_callback(call: types.CallbackQuery):
 
             await bot.send_message(
                 chat_id,
-                "❌ Платеж не был завершен или произошла ошибка."
+                "❌ Платеж не был завершен или произошла ошибка.",
+                reply_markup=keyboard_start(user_id)
             )
         print(f"chat_id: {chat_id}\namout: {amout}\nuser_id: {user_id}\npayment.created_at: {payment.created_at}")
     
@@ -124,78 +127,9 @@ async def handle_buttons(message):
 async def callback_message(callback):
     await CommandProcessing(callback=callback, bot=bot)
 
-async def fetch_data():
-    async with aiosqlite.connect('vpn_bot.db') as connection:
-        cursor = await connection.cursor()
-        await cursor.execute("SELECT date FROM settings WHERE id = ?", (0,))
-        results = await cursor.fetchall()
-        
-        if results:
-            for row in results:
-                now = datetime.now()
-                day = now.day
-                mon = now.month
-                year = now.year
-                h = now.hour
-                m = now.minute
-
-
-                if row[0] != day:
-                    await cursor.execute("UPDATE settings SET date = ? WHERE id = 0", (day,))
-                    await connection.commit()
-                    print("День изменён")
-
-                    await cursor.execute("SELECT * FROM users WHERE user_id IS NOT NULL")
-                    user_results = await cursor.fetchall()
-                    
-                    if user_results:
-                        for user_row in user_results:
-                            print(user_row[1])
-
-                            print(await info_settings(2))
-
-                            tariffDay = await info_settings(2)
-
-                            balance = user_row[1] - tariffDay
-                            balance = max(balance, 0)  # Заменяем if balance<=0: balance=0
-
-                            await cursor.execute('''
-                                INSERT OR IGNORE INTO logs (type, text, date)
-                                VALUES (?, ?, ?)
-                            ''', ("NewDayMinusMoney", f"user_id: {user_row[0]}, Money {user_row[1]} - {tariffDay} = {balance}", f"{day}.{mon}.{year}-{h}:{m}"))
-                            await connection.commit()
-                            
-                            await cursor.execute("UPDATE users SET balance = ? WHERE user_id = ?", (balance, user_row[0]))
-                            await connection.commit()
-
-                            #Уведомления
-                            balance = await info_user(user_row[0], 1)
-                            tariff = await info_settings(2)
-
-                            days_left = balance / tariff if tariff != 0 else 0
-                                            
-                            print(f"days_left {days_left}")
-
-                            if days_left == 1:
-                                print(f"Message To Id{user_row[0]}")
-                                await bot.send_message(user_row[0], f"❗❗ У вас осталось {days_left:.0f} день ❗❗\n\n🚨 Не забудьте продлить тариф 🚨")
-                            elif days_left==0:
-                                print(f"ЫMessage To Id{user_row[0]}")
-                                await bot.send_message(user_row[0], f"❗❗ У вас осталось закончился тариф ❗❗\n\n🚨 Продлейте тариф 🚨")
-                            #
-
-                            if await info_user(user_row[0], 1) == 0:
-                                await mDelUser(user_row[0])
-                                print(f"User id Dell {user_row[0]}")
-
-                else:
-                    print("День совпадает")
-        else:
-            print("Нет данных для id = 0")
-
 async def run_periodically():
     while True:
-        await fetch_data()
+        await fetch_data(bot)
         await asyncio.sleep(60)
 
 async def run_bot():

@@ -17,3 +17,5 @@ async def check_add(check_id, amount, user_id, date, status):
         await conn.commit()
         
         # Асинхронный вызов функции добавления пользователя
+
+

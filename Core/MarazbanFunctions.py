@@ -75,7 +75,7 @@ async def mGetKayUser(user_id):
         return f"Ваш ключ🔑\n{await info_settings(3)}{user_info.subscription_url}"
     except:    
         print("Пользователя не существует")
-        return "Вы не подключенны к тарифу😟"
+        return "Вы не подключенны к тарифу 😟"
 
 
 async def mChangeStatusUser(user_id):
@@ -125,3 +125,4 @@ async def mGet_Data_Info_User(user_id):
 #asyncio.run(mDelUser("1324016724"))
 #print(asyncio.run(mGetKayUser("1324016724")))
 #print(asyncio.run(mGet_Data_Info_User("1324016724")))
+
