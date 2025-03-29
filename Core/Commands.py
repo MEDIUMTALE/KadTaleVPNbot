@@ -8,7 +8,7 @@ from telebot.types import LabeledPrice, Message
 from telebot import types as async_types
 
 from Core.keyboards import *
-from Core.Databases import info_settings, info_user, add_user, existence_user, user_chage_Balance, Chage_User_function_status, DB_CONFIG
+from Core.Databases import info_settings, info_user, add_user, existence_user, user_chage_Balance, Chage_User_function_status, DB_CONFIG, execute_query
 from Core.text import textInfo
 from Core.MarazbanFunctions import mGetKayUser, get_token, api, mGet_Data_Info_User # Добавьте этот импорт
 
@@ -22,12 +22,16 @@ async def BtnCommands(message, bot, user_id):
         await back(message, bot)
 
 
-    elif("pay_balance"):
+    elif(function_status == "pay_balance"):
 
         await Chage_User_function_status(user_id, None)
         await pay_summa_balance(message, bot)
 
-
+    elif(function_status == "send_message_all"):
+        user_results = await execute_query("SELECT * FROM users WHERE user_id IS NOT NULL")
+        for user_row in user_results:
+            await bot.send_message(user_row[0], f"{str(message.text)}")
+        await Chage_User_function_status(user_id, None)
 
 
 # Асинхронные функции обработки команд
@@ -45,12 +49,8 @@ async def buy_subscription_command(message, bot):
     await Chage_User_function_status(message.from_user.id, "pay_balance")
     #await bot.send_message(message.chat.id, text["buy_subscription_command_text"], reply_markup=purchase_a_subscription())
 
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)  # resize_keyboard=True аналогично C# ResizeKeyboard = true
-    row1 = types.KeyboardButton("Назад 🔙")
-    markup.add(row1)
-
     tariffDay = await info_settings(2)
-    await bot.send_message(message.chat.id, f"Введите сумму для пополнения\n1 месяц - {tariffDay*31}₽ ({tariffDay}₽/день)\n3 месяца - {tariffDay*93}₽\n6 месяцев - {tariffDay*186}₽\n12 месяцев - {tariffDay*372}₽\n\n⬇️ Введите сумму для пополнения ⬇️", reply_markup=markup)
+    await bot.send_message(message.chat.id, f"Введите сумму для пополнения\n1 месяц - {tariffDay*31}₽ ({tariffDay}₽/день)\n3 месяца - {tariffDay*93}₽\n6 месяцев - {tariffDay*186}₽\n12 месяцев - {tariffDay*372}₽\n\n⬇️ Введите сумму для пополнения ⬇️", reply_markup=await keyboard_Back())
 
 async def pay_summa_balance(message, bot):
     textAr = message.text.split()
@@ -198,9 +198,14 @@ async def back(message, bot):
 
 #админ комманды    
 async def admin_panel(message, bot):
-    await bot.send_message(message.chat.id, "Выбери пункт", reply_markup=await keyboard_start(message.from_user.id))
+    user_id = message.from_user.id
+    await bot.send_message(message.chat.id, "Выбери пункт", reply_markup=await keyboard_Admin_Panel(user_id))
     return
 
+async def send_message_all(message, bot):
+    user_id = message.from_user.id
+    await Chage_User_function_status(user_id, "send_message_all")
+    await bot.send_message(message.chat.id, "Намишите сообщение для рассылки", reply_markup=await keyboard_Back())
 
 
 #админ комманды Конец    
@@ -218,7 +223,8 @@ COMMANDS = {
     "Назад ⏪": back_command,
     "Партнерка 🤝": invite_friend,
     "Назад 🔙": back,
-    "Админ Панель 🚨" : admin_panel
+    "Админ Панель 🚨" : admin_panel,
+    "Сделать рассылку ✉️": send_message_all
 }
 
 # Асинхронные функции обработки callback кнопок

@@ -146,7 +146,7 @@ async def user_chage_Balance(user_id, value):
     balance = await info_user(user_id,1) + value
     await execute_query(
         "INSERT IGNORE INTO logs (type, text) VALUES (%s, %s)",
-        ("Balance_Add", f"{await info_user(user_id,0)}, Money {b} + {value} = {balance}")
+        ("Balance_Add", f"user_id: {await info_user(user_id,0)}, Money: {b} + {value} = {balance}")
     )
 
 async def fetch_data(bot):

@@ -32,12 +32,17 @@ async def keyboard_start(user_id):
     
     return markup
 
+async def keyboard_Back():
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)  # resize_keyboard=True аналогично C# ResizeKeyboard = true
+    row1 = types.KeyboardButton("Назад 🔙")
+    markup.add(row1)
+    return markup
 
 async def keyboard_Admin_Panel(user_id):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)  # resize_keyboard=True аналогично C# ResizeKeyboard = true
 
     # добавляем строки кнопок
-    row1 = [types.KeyboardButton("Сделать рассылку")]
+    row1 = [types.KeyboardButton("Сделать рассылку ✉️")]
     row2 = [types.KeyboardButton("Назад 🔙")]
     if await info_user(user_id, 2) != 0:
         markup.add(*row1)

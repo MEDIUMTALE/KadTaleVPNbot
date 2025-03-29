@@ -88,7 +88,6 @@ async def check_payment_callback(call: types.CallbackQuery):
                 "⌛ Платеж еще обрабатывается. Попробуйте позже.",
                 reply_markup= await keyboard_start(user_id)
             )
-            await check_add(payment.id, amout, user_id, payment.created_at, status)
 
 
         else:
