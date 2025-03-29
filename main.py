@@ -60,7 +60,7 @@ async def check_payment_callback(call: types.CallbackQuery):
             
             await check_add(payment.id, amout, user_id, payment.created_at, status)
 
-            markup = reply_markup= await keyboard_start(user_id)
+            markup = await keyboard_start(user_id)
 
 
             row1 = types.InlineKeyboardButton("🛠 Инструкция по установке VPN", callback_data="installation_instructions")

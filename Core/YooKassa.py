@@ -39,7 +39,7 @@ async def send_payment_sbp(message: types.Message, bot: AsyncTeleBot, amount: fl
         markup = types.InlineKeyboardMarkup()
         markup.row(
             types.InlineKeyboardButton(
-                text="💳 Оплатить через СБП",
+                text="💳 Оплатить",
                 url=payment.confirmation.confirmation_url
             )
         )

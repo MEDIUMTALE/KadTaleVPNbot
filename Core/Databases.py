@@ -6,8 +6,8 @@ from pymysql.err import OperationalError
 DB_CONFIG = {
     "host": "109.120.132.222",
     "port": 3306,
-    "user": "root",
-    "password": "39281111",
+    "user": "admin",
+    "password": "password",
     "db": "vpn_bot",
     "autocommit": True,
     "minsize": 1,
@@ -18,6 +18,8 @@ DB_CONFIG = {
 
 
 pool = None
+
+#print(DB_CONFIG)
 
 async def create_pool():
     global pool
@@ -134,9 +136,17 @@ async def add_logs(log_type, text):
 
 async def user_chage_Balance(user_id, value):
     xpay = await info_settings(4)
+
+    b = await info_user(user_id,1)
     await execute_query(
         "UPDATE users SET balance = %s WHERE user_id = %s",
         (value * xpay if xpay else value, user_id)
+    )
+    
+    balance = await info_user(user_id,1) + value
+    await execute_query(
+        "INSERT IGNORE INTO logs (type, text) VALUES (%s, %s)",
+        ("Balance_Add", f"{await info_user(user_id,0)}, Money {b} + {value} = {balance}")
     )
 
 async def fetch_data(bot):
