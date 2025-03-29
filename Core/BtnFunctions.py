@@ -1,4 +1,4 @@
-from Core.Databases import info_settings, info_user, add_user, existence_user, user_chage_Balance, Chage_User_function_status, DB_CONFIG, execute_query
+from Core.Databases import info_settings, info_user, add_user, existence_user, user_chage_Balance, Chage_User_function_status, DB_CONFIG, execute_query, add_logs
 from Core.keyboards import *
 
 # Храним данные для каждого пользователя отдельно
@@ -24,6 +24,7 @@ async def BtnCommands(message, bot, user_id):
         for user_row in user_results:
             await bot.send_message(user_row[0], f"{str(message.text)}")
         await Chage_User_function_status(user_id, None)
+        await add_logs("Admin_Send_All_Message", f"user_id: {user_id}, сделал рассылку всем пользователям с текстом: '{str(message.text)}'")
 
     # Изменение баланса (Админка)
     elif function_status == "change_balance_user_id":
@@ -52,11 +53,12 @@ async def BtnCommands(message, bot, user_id):
                 # Меняем баланс target_user_id (user_b_id[user_id]) на amout_b[user_id]
                 await user_chage_Balance(int(user_b_id[user_id]), int(amout_b[user_id]))
                 await bot.send_message(
-                    user_id, 
-                    f"Пользователю {user_b_id[user_id]} установлен баланс: {amout_b[user_id]}", 
+                    user_id,
+                    f"Пользователю {user_b_id[user_id]} установлен баланс: {amout_b[user_id]}",
                     reply_markup=await keyboard_start(user_id)
                 )
                 await Chage_User_function_status(user_id, None)
+                await add_logs("Admin_Change_Balance_User", f"user_id: {user_id}, установил пользователю {user_b_id[user_id]} баланс: {amout_b[user_id]}")
                 
                 # Очищаем данные после выполнения
                 user_b_id.pop(user_id, None)

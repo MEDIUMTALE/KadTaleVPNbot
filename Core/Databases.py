@@ -93,7 +93,7 @@ async def add_user(user_id):
         # Логируем действие
         await execute_query(
             "INSERT IGNORE INTO logs (type, text) VALUES (%s, %s)",
-            ("Registration", f"user_id: {user_id}, user_id: '{user_id}' зарегистрировался")
+            ("Registration", f"user_id: '{user_id}' зарегистрировался")
         )
         
         await mAddUser(user_id)
