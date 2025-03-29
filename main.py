@@ -1,8 +1,7 @@
 import asyncio
 from datetime import datetime
-import aiosqlite  # Асинхронная замена для sqlite3
-
-from telebot.async_telebot import AsyncTeleBot  # Асинхронная версия telebot
+import aiosqlite
+from telebot.async_telebot import AsyncTeleBot 
 from telebot.types import LabeledPrice, Message
 from telebot import types
 

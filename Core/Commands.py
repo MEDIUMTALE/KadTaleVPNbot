@@ -48,7 +48,9 @@ async def buy_subscription_command(message, bot):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)  # resize_keyboard=True аналогично C# ResizeKeyboard = true
     row1 = types.KeyboardButton("Назад 🔙")
     markup.add(row1)
-    await bot.send_message(message.chat.id, "Введите на сколько хотите пополнить балланс", reply_markup=markup)
+
+    tariffDay = await info_settings(2)
+    await bot.send_message(message.chat.id, f"Введите сумму для пополнения\n1 месяц - {tariffDay*31}₽ ({tariffDay}₽/день)\n3 месяца - {tariffDay*93}₽\n6 месяцев - {tariffDay*186}₽\n12 месяцев - {tariffDay*372}₽\n\n⬇️ Введите сумму для пополнения ⬇️", reply_markup=markup)
 
 async def pay_summa_balance(message, bot):
     textAr = message.text.split()
@@ -316,11 +318,13 @@ async def CommandProcessing(message=None, bot=None, callback=None):
                 if(command_function):
                     await command_function(message, bot)
                 else:
-                    await bot.send_message(message.chat.id, "Я не знаю такой комманды😟", reply_markup=await keyboard_start(message.from_user.id))
+                    await bot.send_message(message.chat.id, "Я не знаю такой комманды😟")
+                    await back(message,bot)
 
     elif callback and callback.message:
         callback_function = CALLBACKS.get(callback.data)
         if callback_function:
             await callback_function(callback, bot)
         else:
-            await bot.send_message(callback.message.chat.id, "Я не знаю такой комманды😟", reply_markup=await keyboard_start(message.from_user.id))
+            await bot.send_message(callback.message.chat.id, "Я не знаю такой комманды😟")
+            await back(message,bot)

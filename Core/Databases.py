@@ -203,7 +203,13 @@ async def fetch_data(bot):
         print(f"Ошибка в fetch_data: {e}")
 
 
-
+#ТЕКСТ
+async def info_text(name):
+    results = await execute_query(
+        "SELECT * FROM text WHERE name = %s", 
+        (name,)
+    )
+    return results[0][2].replace("\\n", "\n") if results else None
 
 
 #ЧЕКИ
