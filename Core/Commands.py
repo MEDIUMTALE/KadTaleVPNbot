@@ -12,27 +12,8 @@ from Core.Databases import info_settings, info_user, add_user, existence_user, u
 from Core.text import textInfo
 from Core.MarazbanFunctions import mGetKayUser, get_token, api, mGet_Data_Info_User # Добавьте этот импорт
 
+from Core.BtnFunctions import BtnCommands
 from Core.YooKassa import send_payment_sbp
-
-# Комманды вызванные кнопками
-async def BtnCommands(message, bot, user_id):
-    function_status = await info_user(user_id, 3)
-    
-    if(message.text == "Назад 🔙"):
-        await back(message, bot)
-
-
-    elif(function_status == "pay_balance"):
-
-        await Chage_User_function_status(user_id, None)
-        await pay_summa_balance(message, bot)
-
-    elif(function_status == "send_message_all"):
-        user_results = await execute_query("SELECT * FROM users WHERE user_id IS NOT NULL")
-        for user_row in user_results:
-            await bot.send_message(user_row[0], f"{str(message.text)}")
-        await Chage_User_function_status(user_id, None)
-
 
 # Асинхронные функции обработки команд
 
@@ -207,6 +188,10 @@ async def send_message_all(message, bot):
     await Chage_User_function_status(user_id, "send_message_all")
     await bot.send_message(message.chat.id, "Намишите сообщение для рассылки", reply_markup=await keyboard_Back())
 
+async def change_balance_user_id(message, bot):
+    user_id = message.from_user.id
+    await Chage_User_function_status(user_id, "change_balance_user_id")
+    await bot.send_message(message.chat.id, "Напишите id пользователя", reply_markup=await keyboard_Back())
 
 #админ комманды Конец    
 
@@ -224,7 +209,8 @@ COMMANDS = {
     "Партнерка 🤝": invite_friend,
     "Назад 🔙": back,
     "Админ Панель 🚨" : admin_panel,
-    "Сделать рассылку ✉️": send_message_all
+    "Сделать рассылку ✉️": send_message_all,
+    "Изменить боланс пользователя 💸" : change_balance_user_id
 }
 
 # Асинхронные функции обработки callback кнопок

@@ -4,10 +4,10 @@ from datetime import datetime
 from pymysql.err import OperationalError
 
 DB_CONFIG = {
-    "host": "109.120.132.222",
-    "port": 3306,
-    "user": "admin",
-    "password": "password",
+    "host": "127.0.0.1",
+    #"port": 3306,
+    "user": "root",
+    "password": "",
     "db": "vpn_bot",
     "autocommit": True,
     "minsize": 1,
