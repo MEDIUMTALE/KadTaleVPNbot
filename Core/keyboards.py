@@ -16,6 +16,9 @@ async def keyboard_start(user_id):
         types.KeyboardButton("Помощь 🛟")
     ]
     row5 = [types.KeyboardButton("Партнерка 🤝")]
+    
+    
+    row6 = [types.KeyboardButton("Админ Панель 🚨")]
 
     # добавляем строки в клавиатуру
     markup.add(*row1)
@@ -23,7 +26,25 @@ async def keyboard_start(user_id):
     markup.add(*row3)
     markup.add(*row4)
     markup.add(*row5)
+    if await info_user(user_id, 2) != 0:
+        markup.add(*row6)
 
+    
+    return markup
+
+
+async def keyboard_Admin_Panel(user_id):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)  # resize_keyboard=True аналогично C# ResizeKeyboard = true
+
+    # добавляем строки кнопок
+    row1 = [types.KeyboardButton("Сделать рассылку")]
+    row2 = [types.KeyboardButton("Назад 🔙")]
+    if await info_user(user_id, 2) != 0:
+        markup.add(*row1)
+    
+    markup.add(*row2)
+
+    
     return markup
 
 def keyboard_balance(): # РАЗОБРАТЬСЯ С ЭТОХУЙ ХУЙНЕЙ
@@ -119,6 +140,7 @@ def frequent_questions():
     row3 = types.InlineKeyboardButton("🚫 VPN Не работает", callback_data="vpn_no_work")
     row4 = types.InlineKeyboardButton("💬 Другой вопрос (поддержка)", url=profile_url, callback_data="contact_support")
     row5 = types.InlineKeyboardButton("⏪ Назад", callback_data="guide_back")
+    
 
     markup.add(row1)
     markup.add(row2)

@@ -195,7 +195,16 @@ async def back(message, bot):
     user_id = message.from_user.id
     await Chage_User_function_status(user_id, None)
     await bot.send_message(message.chat.id, "Выберете пункт", reply_markup=await keyboard_start(user_id))
-    
+
+#админ комманды    
+async def admin_panel(message, bot):
+    await bot.send_message(message.chat.id, "Выбери пункт", reply_markup=await keyboard_start(message.from_user.id))
+    return
+
+
+
+#админ комманды Конец    
+
 
 # Словарь команд (теперь хранит асинхронные функции)
 COMMANDS = {
@@ -208,7 +217,8 @@ COMMANDS = {
     "Помощь 🛟": help_command,
     "Назад ⏪": back_command,
     "Партнерка 🤝": invite_friend,
-    "Назад 🔙": back
+    "Назад 🔙": back,
+    "Админ Панель 🚨" : admin_panel
 }
 
 # Асинхронные функции обработки callback кнопок
