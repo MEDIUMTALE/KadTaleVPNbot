@@ -15,8 +15,11 @@ async def BtnCommands(message, bot, user_id):
 
     # Пополнение баланса
     elif function_status == "pay_balance":
-        await Chage_User_function_status(user_id, None)
-        await pay_summa_balance(message, bot)
+        if message.text.isdigit():
+            await Chage_User_function_status(user_id, None)
+            await pay_summa_balance(message, bot)
+        else:
+            await bot.send_message(user_id, f"Неверное число")
 
     # Рассылка сообщений
     elif function_status == "send_message_all":

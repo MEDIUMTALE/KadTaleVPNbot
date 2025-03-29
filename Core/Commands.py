@@ -31,7 +31,7 @@ async def buy_subscription_command(message, bot):
     #await bot.send_message(message.chat.id, text["buy_subscription_command_text"], reply_markup=purchase_a_subscription())
 
     tariffDay = await info_settings(2)
-    await bot.send_message(message.chat.id, f"Введите сумму для пополнения\n1 месяц - {tariffDay*31}₽ ({tariffDay}₽/день)\n3 месяца - {tariffDay*93}₽\n6 месяцев - {tariffDay*186}₽\n12 месяцев - {tariffDay*372}₽\n\n⬇️ Введите сумму для пополнения ⬇️", reply_markup=await keyboard_Back())
+    await bot.send_message(message.chat.id, f"Введите сумму для пополнения\n1 месяц - {tariffDay*31}₽ ({tariffDay}₽/день)\n3 месяца - {tariffDay*93}₽\n6 месяцев - {tariffDay*186}₽\n12 месяцев - {tariffDay*372}₽\n\n⬇️ Введите сумму пополнения ⬇️", reply_markup=await keyboard_Back())
 
 async def pay_summa_balance(message, bot):
     textAr = message.text.split()
