@@ -38,17 +38,33 @@ async def start_command(message, bot):
 
                     await user_chage_Referrer_Id(user_id, referrer_id)
                     await add_logs("Referrer_Id", f"user_id: {user_id}, перешёл по реверальной ссылке пользователя '{referrer_id}'")
-                    chat_member = await bot.get_chat_member(message.chat.id, user_id)
-                    username = chat_member.user.username
+                    #Я
+                    me_chat_member = await bot.get_chat_member(message.chat.id, user_id)
+                    me_username = me_chat_member.user.username
                     
-                    userteg = chat_member.user.username
+                    me_userteg = me_chat_member.user.username
 
-                    if userteg:
-                        userteg = f"(@{chat_member.user.username})"
+
+                    if me_userteg:
+                        me_userteg = f"(@{me_chat_member.user.username}) "
                     else:
-                        userteg = ""
+                        me_userteg = ""
 
-                    await bot.send_message(referrer_id, f"По вашей реферальной ссылке зарегистрировался пользователь '{username}'{userteg}🎉\n\nВам начисленно 30р💸", reply_markup=await keyboard_start(user_id))
+
+                        
+                    #ЧЕЙ РЕФЕРАЛ
+                    referrer_chat_member = await bot.get_chat_member(referrer_id, referrer_id)
+                    referrer_username = referrer_chat_member.user.username
+                    
+                    referrer_userteg = referrer_chat_member.user.username
+
+                    if referrer_userteg:
+                        referrer_userteg = f"(@{referrer_chat_member.user.username}) "
+                    else:
+                        referrer_userteg = ""
+
+                    await bot.send_message(referrer_id, f"По вашей реферальной ссылке зарегистрировался пользователь ' {me_username}'{me_userteg}🎉\n\nВам начисленно 30р 💸", reply_markup=await keyboard_start(user_id))
+                    await bot.send_message(user_id, f"Вы зарегистрировались по реверальной ссылке от '{referrer_username}'{referrer_userteg}🎉\n\nВам начисленно 15р 💸", reply_markup=await keyboard_start(user_id))
                     
             except ValueError:
                 referrer_id = None
