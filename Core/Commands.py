@@ -70,9 +70,10 @@ async def start_command(message, bot):
                 referrer_id = None
 
             #htathfk
-    
-    await bot.send_message(message.chat.id, "Вы зарегистрированы!", reply_markup=await keyboard_start(user_id))
-    await bot.send_message(message.chat.id, "Привет! Выбери один из вариантов ниже:", reply_markup=await keyboard_start(user_id))
+        else:
+            await bot.send_message(message.chat.id, "Вы зарегистрированы!", reply_markup=await keyboard_start(user_id))
+
+    await bot.send_message(message.chat.id, "Выбери один из вариантов ниже:", reply_markup=await keyboard_start(user_id))
 
 async def info_vpn_command(message, bot):
     await bot.send_message(message.chat.id, await textInfo("info_vpn_command_text"))
