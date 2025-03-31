@@ -72,7 +72,7 @@ async def mGetKayUser(user_id):
 
         user_info = await api.get_user(username=f"{user_id}", token=token.access_token)
 
-        return f"Ваш ключ🔑\n{await info_settings(3)}{user_info.subscription_url}"
+        return f"Ваш ключ 🔑\n{await info_settings(3)}{user_info.subscription_url}"
     except:    
         print("Пользователя не существует")
         return "Вы не подключенны к тарифу 😟"

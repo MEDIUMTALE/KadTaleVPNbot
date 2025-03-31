@@ -14,8 +14,8 @@ from Core.MarazbanFunctions import *
 from Core.YooKassa import check_payment_status
 from yookassa import Payment
 
-token = "7662636396:AAGcWhdrmXkbYFKWkOWYCweQ5WDgsI622W4"
-#token = "6120629335:AAF8ERXPC7rCzWccZbKwi1WxODAzqBPObx8"
+#token = "7662636396:AAGcWhdrmXkbYFKWkOWYCweQ5WDgsI622W4"
+token = "6120629335:AAF8ERXPC7rCzWccZbKwi1WxODAzqBPObx8"
 bot = AsyncTeleBot(token)
 
 
@@ -56,7 +56,6 @@ async def check_payment_callback(call: types.CallbackQuery):
                 chat_id=call.message.chat.id,
                 message_id=call.message.message_id
             )
-            
             await check_add(payment.id, amout, user_id, payment.created_at, status)
 
             markup = await keyboard_start(user_id)

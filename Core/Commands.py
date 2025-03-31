@@ -8,7 +8,7 @@ from telebot.types import LabeledPrice, Message
 from telebot import types as async_types
 
 from Core.keyboards import *
-from Core.Databases import info_settings, info_user, add_user, existence_user, user_chage_Balance, Chage_User_function_status, DB_CONFIG, execute_query
+from Core.Databases import info_settings, info_user, add_user, existence_user, user_chage_Balance, Chage_User_function_status, DB_CONFIG, execute_query, user_chage_Referrer_Id, add_logs, Referrer_Count
 from Core.text import textInfo
 from Core.MarazbanFunctions import mGetKayUser, get_token, api, mGet_Data_Info_User # Добавьте этот импорт
 
@@ -19,7 +19,42 @@ from Core.YooKassa import send_payment_sbp
 
 async def start_command(message, bot):
     user_id = message.from_user.id
-    await add_user(user_id)
+    if await existence_user(user_id) != True:
+        await add_user(user_id)
+
+        #htathfk
+
+        # Обработка реферальной ссылки (если есть)
+        referrer_id = None
+        if len(message.text.split()) > 1:
+            try:
+                referrer_id = int(message.text.split()[1])
+                print(f"referrer_id: {referrer_id}")
+                # Ceotcndetn htath bkb ytn реферер
+                if (await existence_user(referrer_id) and referrer_id != user_id):
+                    await user_chage_Balance(referrer_id, await info_user(referrer_id, 1) + 30)
+                    await user_chage_Balance(user_id, await info_user(user_id, 1) + 15)
+                    
+
+                    await user_chage_Referrer_Id(user_id, referrer_id)
+                    await add_logs("Referrer_Id", f"user_id: {user_id}, перешёл по реверальной ссылке пользователя '{referrer_id}'")
+                    chat_member = await bot.get_chat_member(message.chat.id, user_id)
+                    username = chat_member.user.username
+                    
+                    userteg = chat_member.user.username
+
+                    if userteg:
+                        userteg = f"(@{chat_member.user.username})"
+                    else:
+                        userteg = ""
+
+                    await bot.send_message(referrer_id, f"По вашей реферальной ссылке зарегистрировался пользователь '{username}'{userteg}🎉\n\nВам начисленно 30р💸", reply_markup=await keyboard_start(user_id))
+                    
+            except ValueError:
+                referrer_id = None
+
+            #htathfk
+    
     await bot.send_message(message.chat.id, "Вы зарегистрированы!", reply_markup=await keyboard_start(user_id))
     await bot.send_message(message.chat.id, "Привет! Выбери один из вариантов ниже:", reply_markup=await keyboard_start(user_id))
 
@@ -31,7 +66,7 @@ async def buy_subscription_command(message, bot):
     #await bot.send_message(message.chat.id, text["buy_subscription_command_text"], reply_markup=purchase_a_subscription())
 
     tariffDay = await info_settings(2)
-    await bot.send_message(message.chat.id, f"Введите сумму для пополнения\n1 месяц - {tariffDay*31}₽ ({tariffDay}₽/день)\n3 месяца - {tariffDay*93}₽\n6 месяцев - {tariffDay*186}₽\n12 месяцев - {tariffDay*372}₽\n\n⬇️ Введите сумму пополнения ⬇️", reply_markup=await keyboard_Back())
+    await bot.send_message(message.chat.id, f"Введите сумму для пополнения:\n1 месяц - {tariffDay*31}₽ ({tariffDay}₽/день)\n3 месяца - {tariffDay*93}₽\n6 месяцев - {tariffDay*186}₽\n12 месяцев - {tariffDay*372}₽\n\n⬇️ Введите сумму пополнения ⬇️", reply_markup=await keyboard_Back())
 
 async def pay_summa_balance(message, bot):
     textAr = message.text.split()
@@ -74,7 +109,8 @@ async def back_command(message, bot):
     await bot.send_message(message.chat.id, "Выбери один из вариантов ниже:", reply_markup=await keyboard_start(message.from_user.id))
 
 async def invite_friend(message, bot):
-    await bot.send_message(message.chat.id, "Вы можете пригласить друга, и вы оба получите вознаграждение! (в разработке)")
+    user_id = message.from_user.id
+    await bot.send_message(message.chat.id, f"Вы можете пригласить друга, и вы оба получите вознаграждение!\n\nЕсли ваш друг создаст аккаунт по ссылке то вы получите 30р, а ваш друг 15р\n\nВаша реферальная ссылка: https://t.me/{await info_settings(6)}?start={user_id}\n\nЛюдей зарегистрированно по вашей ссылке: {await Referrer_Count(user_id)}")
 
 async def vpn_key(message, bot):
     if await info_user(message.from_user.id, 1) != 0:
@@ -175,23 +211,23 @@ async def info_tariff(message, bot):
 async def back(message, bot):
     user_id = message.from_user.id
     await Chage_User_function_status(user_id, None)
-    await bot.send_message(message.chat.id, "Выберете пункт", reply_markup=await keyboard_start(user_id))
+    await bot.send_message(message.chat.id, "Выберете пункт:", reply_markup=await keyboard_start(user_id))
 
 #админ комманды    
 async def admin_panel(message, bot):
     user_id = message.from_user.id
-    await bot.send_message(message.chat.id, "Выбери пункт", reply_markup=await keyboard_Admin_Panel(user_id))
+    await bot.send_message(message.chat.id, "Выбери пункт:", reply_markup=await keyboard_Admin_Panel(user_id))
     return
 
 async def send_message_all(message, bot):
     user_id = message.from_user.id
     await Chage_User_function_status(user_id, "send_message_all")
-    await bot.send_message(message.chat.id, "Намишите сообщение для рассылки", reply_markup=await keyboard_Back())
+    await bot.send_message(message.chat.id, "Намишите сообщение для рассылки:", reply_markup=await keyboard_Back())
 
 async def change_balance_user_id(message, bot):
     user_id = message.from_user.id
     await Chage_User_function_status(user_id, "change_balance_user_id")
-    await bot.send_message(message.chat.id, "Напишите id пользователя", reply_markup=await keyboard_Back())
+    await bot.send_message(message.chat.id, "Напишите id пользователя:", reply_markup=await keyboard_Back())
 
 #админ комманды Конец    
 

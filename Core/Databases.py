@@ -4,10 +4,13 @@ from datetime import datetime
 from pymysql.err import OperationalError
 
 DB_CONFIG = {
-    "host": "109.120.132.222",
-    "port": 3306,
-    "user": "admin",
-    "password": "password",
+    #"host": "109.120.132.222",
+    "host": "127.0.0.1",
+    #"port": 3306,
+    #"user": "admin",
+    "user": "root",
+    #"password": "password",
+    "password": "",
     "db": "vpn_bot",
     "autocommit": True,
     "minsize": 1,
@@ -89,7 +92,7 @@ async def add_user(user_id):
             "INSERT IGNORE INTO users (user_id, balance) VALUES (%s, %s)",
             (user_id, await info_settings(5))
         )
-        
+
         # Логируем действие
         await execute_query(
             "INSERT IGNORE INTO logs (type, text) VALUES (%s, %s)",
@@ -147,6 +150,11 @@ async def user_chage_Balance(user_id, value):
     await execute_query(
         "INSERT IGNORE INTO logs (type, text) VALUES (%s, %s)",
         ("Balance_Add", f"user_id: {await info_user(user_id,0)}, Money: {b} + {value} = {balance}")
+    )
+async def user_chage_Referrer_Id(user_id, value):
+    await execute_query(
+        "UPDATE users SET referrer_id = %s WHERE user_id = %s",
+        (value, user_id)
     )
 
 async def fetch_data(bot):
@@ -227,6 +235,16 @@ async def check_exists(check_id):
         (check_id,)
     )
     return bool(results)
+#ЧЕКИ КОНЕЦ
+
+#ВЫВОД ИНФОРАМАЦИИ О КОЛИЧЕСТВЕ ТВОИХ РЕФЕРАЛОВ
+
+async def Referrer_Count(user_id):
+    user_results = await execute_query("SELECT * FROM users WHERE referrer_id = %s", (user_id))
+    return len(user_results)
+
+
+#ВЫВОД ИНФОРАМАЦИИ О КОЛИЧЕСТВЕ ТВОИХ РЕФЕРАЛОВ КОНЕЦ
 
 
 
