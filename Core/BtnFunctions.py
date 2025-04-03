@@ -1,5 +1,6 @@
 from Core.Databases import info_settings, info_user, add_user, existence_user, user_chage_Balance, Chage_User_function_status, DB_CONFIG, execute_query, add_logs
 from Core.keyboards import *
+from Core.MarazbanFunctions import mGet_Data_Info_User
 
 # Храним данные для каждого пользователя отдельно
 user_b_id = {}  # Формат: {user_id: target_user_id}
@@ -71,3 +72,16 @@ async def BtnCommands(message, bot, user_id):
         except Exception as e:
             print(f"Ошибка в change_balance_user_amout: {e}")
             await back(message, bot)
+    
+    elif function_status == "command_info_user_gb":
+        try:
+            if message.text.isdigit():
+                await bot.send_message(user_id, await mGet_Data_Info_User(message.text))
+            else:
+                await bot.send_message(user_id, f"Неверное число")
+                
+        except Exception as e:
+            print(f"Ошибка в change_balance_user_amout: {e}")
+            await back(message, bot)
+
+    

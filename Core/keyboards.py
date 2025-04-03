@@ -44,12 +44,20 @@ async def keyboard_Admin_Panel(user_id):
     # добавляем строки кнопок
     row1 = [types.KeyboardButton("Сделать рассылку ✉️")]
     row2 = [types.KeyboardButton("Изменить боланс пользователя 💸")]
-    row3 = [types.KeyboardButton("Назад 🔙")]
+    row3 = [types.KeyboardButton("Узнать сколько GB потратил пользователь ⚡️")]
+    row4 = [types.KeyboardButton("Собрать статистику пользователей 📋")]
+    row5 = [types.KeyboardButton("Доход за месяц 💵")]
+    row6 = [types.KeyboardButton("Доход за день 💵")]
+    row7 = [types.KeyboardButton("Назад 🔙")]
     if await info_user(user_id, 2) != 0:
         markup.add(*row1)
         markup.add(*row2)
+        markup.add(*row3)
+        markup.add(*row4)
+        markup.add(*row5)
+        markup.add(*row6)
     
-    markup.add(*row3)
+    markup.add(*row7)
 
     
     return markup

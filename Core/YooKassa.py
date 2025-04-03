@@ -52,7 +52,7 @@ async def send_payment_sbp(message: types.Message, bot: AsyncTeleBot, amount: fl
 
         await bot.send_message(
             chat_id=chat_id,
-            text=f"✅ Для оплаты {amount} руб. нажмите кнопку ниже:",
+            text=f"После полаты бязательно нажмите \"🔄 Проверить оплату\" ❗️\n✅ Для оплаты {amount} руб. нажмите кнопку ниже:",
             reply_markup=markup
         )
 

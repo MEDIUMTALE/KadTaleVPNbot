@@ -8,7 +8,7 @@ from telebot.types import LabeledPrice, Message
 from telebot import types as async_types
 
 from Core.keyboards import *
-from Core.Databases import info_settings, info_user, add_user, existence_user, user_chage_Balance, Chage_User_function_status, DB_CONFIG, execute_query, user_chage_Referrer_Id, add_logs, Referrer_Count
+from Core.Databases import info_settings, info_user, add_user, existence_user, user_chage_Balance, Chage_User_function_status, DB_CONFIG, execute_query, user_chage_Referrer_Id, add_logs, Referrer_Count, bInfo_Stats_Users, bMonth_finance, bDay_finance
 from Core.text import textInfo
 from Core.MarazbanFunctions import mGetKayUser, get_token, api, mGet_Data_Info_User # Добавьте этот импорт
 
@@ -246,6 +246,22 @@ async def change_balance_user_id(message, bot):
     await Chage_User_function_status(user_id, "change_balance_user_id")
     await bot.send_message(message.chat.id, "Напишите id пользователя:", reply_markup=await keyboard_Back())
 
+async def command_info_user_gb(message, bot):
+    user_id = message.from_user.id
+    await Chage_User_function_status(user_id, "command_info_user_gb")
+    await bot.send_message(message.chat.id, "Напишите id пользователя:", reply_markup=await keyboard_Back())
+
+async def admin_command_satus_users_gb(message, bot):
+    await bot.send_message(message.chat.id, f"Идёт обработка пользователей.\nПожалуйста подождите...")
+    await bot.send_message(message.chat.id, f"{await bInfo_Stats_Users()}")
+
+async def admin_month_finance(message, bot):
+    await bot.send_message(message.chat.id, f"Прибль за месяц (Без вычита налога):: {await bMonth_finance()}р")
+
+
+async def admin_day_finance(message, bot):
+    await bot.send_message(message.chat.id, f"Прибль за день (Без вычита налога):: {await bDay_finance()}р")
+#админ комманды Конец  
 #админ комманды Конец    
 
 
@@ -263,7 +279,11 @@ COMMANDS = {
     "Назад 🔙": back,
     "Админ Панель 🚨" : admin_panel,
     "Сделать рассылку ✉️": send_message_all,
-    "Изменить боланс пользователя 💸" : change_balance_user_id
+    "Изменить боланс пользователя 💸" : change_balance_user_id,
+    "Узнать сколько GB потратил пользователь ⚡️" : command_info_user_gb,
+    "Собрать статистику пользователей 📋" : admin_command_satus_users_gb,
+    "Доход за месяц 💵" : admin_month_finance,
+    "Доход за день 💵" : admin_day_finance
 }
 
 # Асинхронные функции обработки callback кнопок

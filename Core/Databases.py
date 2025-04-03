@@ -247,6 +247,69 @@ async def Referrer_Count(user_id):
 #ВЫВОД ИНФОРАМАЦИИ О КОЛИЧЕСТВЕ ТВОИХ РЕФЕРАЛОВ КОНЕЦ
 
 
+#АДМИН СБОР СТАТИСТИКИ
+
+async def bInfo_Stats_Users():
+    from Core.MarazbanFunctions import mGet_Data_Info_Stats_User
+    user_results = await execute_query("SELECT * FROM users WHERE user_id IS NOT NULL")
+
+    active_count = 0
+    diseible_count = 0
+
+    for user_row in user_results:
+        try:
+            id = user_row[0]
+            Data = await mGet_Data_Info_Stats_User(id)
+            print(f"Data = {Data}")
+            if float(Data) > 0.1:
+                active_count = active_count + 1
+        except Exception as e:
+            print(f"Error - {e}")
+    
+    diseible_count = len(user_results) - active_count
+    
+    return f"Активных пользователей: {active_count}\nМёртвых пользователей: {diseible_count}"
+
+#АДМИН СБОР СТАТИСТИКИ КОНЕЦ
+
+#ДЕНЬГИ ЗА МЕСЯЦ
+async def bMonth_finance():
+    now = datetime.now()
+    date_pattern = f"%{now.year}-{now.month:02d}%"
+    amaut_check = await execute_query(
+        "SELECT * FROM checks WHERE status = 'succeeded' AND date LIKE %s",
+        (date_pattern,)
+    )
+
+    summa = 0
+    for amaut in amaut_check:
+        try:
+            print(f"MOOBY: {int(amaut[3])}")
+            summa +=  int(amaut[3])
+        except:
+            return False
+    return f"{summa}"
+#ДЕНЬГИ ЗА МЕСЯЦ КОНЕЦ
+
+#ДЕНЬГИ ЗА ДЕНЬ
+async def bDay_finance():
+    now = datetime.now()
+    date_pattern = f"%{now.year}-{now.month:02d}-{now.day:02d}%"
+    amaut_check = await execute_query(
+        "SELECT * FROM checks WHERE status = 'succeeded' AND date LIKE %s",
+        (date_pattern,)
+    )
+
+    summa = 0
+    for amaut in amaut_check:
+        try:
+            print(f"MOOBY: {int(amaut[3])}")
+            summa +=  int(amaut[3])
+        except:
+            return False
+    return f"{summa}"
+#ДЕНЬГИ ЗА МЕСЯЦ КОНЕЦ
+
 
 async def close_pool():
     """Закрывает пул соединений"""
