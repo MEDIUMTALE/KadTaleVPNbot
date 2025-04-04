@@ -256,11 +256,11 @@ async def admin_command_satus_users_gb(message, bot):
     await bot.send_message(message.chat.id, f"{await bInfo_Stats_Users()}")
 
 async def admin_month_finance(message, bot):
-    await bot.send_message(message.chat.id, f"Прибль за месяц (Без вычита налога):: {await bMonth_finance()}р")
+    await bot.send_message(message.chat.id, f"Прибль за месяц (Без вычита налога): {await bMonth_finance()}р")
 
 
 async def admin_day_finance(message, bot):
-    await bot.send_message(message.chat.id, f"Прибль за день (Без вычита налога):: {await bDay_finance()}р")
+    await bot.send_message(message.chat.id, f"Прибль за день (Без вычита налога): {await bDay_finance()}р")
 #админ комманды Конец  
 #админ комманды Конец    
 
